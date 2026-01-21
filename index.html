@@ -494,12 +494,7 @@
                 <label>Username</label>
                 <input type="text" id="usernameInput" placeholder="Enter your username">
             </div>
-            
-            <div class="form-group">
-                <label>Server URL</label>
-                <input type="text" id="serverInput" value="https://chat-app-backend-6piw.onrender.com" placeholder="https://chat-app-backend-6piw.onrender.com>
-            </div>
-            
+                       
             <button class="btn-primary" onclick="connect()">Connect</button>
             
             <p class="info-text">Commands: /list • /chat [user] • /group</p>
@@ -570,7 +565,8 @@
 
         function connect() {
             username = document.getElementById('usernameInput').value.trim();
-            const serverUrl = document.getElementById('serverInput').value.trim();
+            const SERVER_URL = "https://chat-app-backend-6piw.onrender.com";
+            const serverUrl = SERVER_URL;
 
             if (!username) {
                 alert('Please enter a username');
@@ -906,3 +902,4 @@
 </body>
 
 </html>
+
