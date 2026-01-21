@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #loginScreen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        #chatScreen {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            background: #f5f7fa;
+        }
+
+        .login-container {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .info-text {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+
+        .chat-header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e1e8ed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header-left h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chat-header-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #10b981;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f5f7fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.sent {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message.received {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .message.system {
+            display: flex;
+            justify-content: center;
+        }
+
+        .message-bubble {
+            max-width: 60%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            position: relative;
+        }
+
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message.received .message-bubble {
+            background: white;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .message.private .message-bubble {
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #fbbf24;
+        }
+
+        .message.system .message-bubble {
+            background: #e5e7eb;
+            color: #4b5563;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .message.file .message-bubble {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 2px solid #3b82f6;
+        }
+
+        .message-sender {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            opacity: 0.8;
+        }
+
+        .message-time {
+            font-size: 10px;
+            margin-top: 4px;
+            opacity: 0.6;
+        }
+
+        .file-download {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .file-download:hover {
+            background: #2563eb;
+        }
+
+        .input-container {
+            background: white;
+            padding: 20px 30px;
+            border-top: 1px solid #e1e8ed;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-icon {
+            width: 48px;
+            height: 48px;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 20px;
+        }
+
+        .btn-icon:hover {
+            background: #e5e7eb;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        #messageInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-send {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+            font-size: 20px;
+        }
+
+        .btn-send:hover {
+            transform: scale(1.05);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #333;
+            font-size: 20px;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-chat {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-chat:hover {
+            background: #5568d3;
+        }
+
+        .file-dialog {
+            padding: 20px;
+        }
+
+        .file-dialog-info {
+            margin-bottom: 20px;
+        }
+
+        .file-dialog-info p {
+            margin: 8px 0;
+            color: #333;
+        }
+
+        .file-dialog-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-dialog {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-dialog.primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-dialog.primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-dialog.secondary {
+            background: #e5e7eb;
+            color: #333;
+        }
+
+        .btn-dialog.secondary:hover {
+            background: #d1d5db;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginScreen">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-icon">💬</div>
+                <h1>Chat Application</h1>
+                <p>Connect and communicate instantly</p>
+            </div>
+            
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="usernameInput" placeholder="Enter your username">
+            </div>
+            
+            <div class="form-group">
+                <label>Server URL</label>
+                <input type="text" id="serverInput" value="ws://localhost:65535" placeholder="ws://localhost:65535">
+            </div>
+            
+            <button class="btn-primary" onclick="connect()">Connect</button>
+            
+            <p class="info-text">Commands: /list • /chat [user] • /group</p>
+            <p class="info-text" style="margin-top: 10px; font-size: 11px;">
+                💡 Tip: Enable "Ask where to save" in browser settings to choose download location
+            </p>
+        </div>
+    </div>
+
+    <div id="chatScreen">
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <h2>Chat Application</h2>
+                <div class="chat-status">
+                    <div class="status-dot"></div>
+                    <span id="statusText">Connecting...</span>
+                </div>
+            </div>
+            <div class="chat-header-right">
+                <button class="btn-secondary" onclick="showUserList()">
+                    👥 Users
+                </button>
+                <button class="btn-secondary btn-success" onclick="enableGroupChat()">
+                    🌍 Group
+                </button>
+            </div>
+        </div>
+
+        <div class="messages-container" id="messagesContainer"></div>
+
+        <div class="input-container">
+            <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)">
+            <button class="btn-icon" onclick="document.getElementById('fileInput').click()">
+                📎
+            </button>
+            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+            <button class="btn-send" onclick="sendMessage()">
+                ➤
+            </button>
+        </div>
+    </div>
+
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Online Users</h3>
+                <button class="btn-close" onclick="closeUserModal()">×</button>
+            </div>
+            <div id="userList"></div>
+        </div>
+    </div>
+
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Incoming File</h3>
+            </div>
+            <div class="file-dialog" id="fileDialogContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let username = '';
+        let currentMode = 'group';
+        let privateReceiver = '';
+        let onlineUsers = [];
+
+        function connect() {
+            username = document.getElementById('usernameInput').value.trim();
+            const serverUrl = document.getElementById('serverInput').value.trim();
+
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
+
+            try {
+                ws = new WebSocket(serverUrl);
+
+                ws.onopen = () => {
+                    ws.send(JSON.stringify({
+                        type: 'auth',
+                        username: username
+                    }));
+                };
+
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    handleMessage(data);
+                };
+
+                ws.onerror = (error) => {
+                    addMessage('System', 'Connection error occurred', 'system');
+                };
+
+                ws.onclose = () => {
+                    addMessage('System', 'Disconnected from server', 'system');
+                    document.getElementById('statusText').textContent = 'Disconnected';
+                };
+
+            } catch (error) {
+                alert('Failed to connect: ' + error.message);
+            }
+        }
+
+        function handleMessage(data) {
+            switch(data.type) {
+                case 'auth_success':
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('chatScreen').style.display = 'flex';
+                    document.getElementById('statusText').textContent = username + ' • Group Chat';
+                    addMessage('System', 'Connected successfully!', 'system');
+                    break;
+                case 'auth_error':
+                    alert(data.message);
+                    ws.close();
+                    break;
+                case 'message':
+                    addMessage(data.sender, data.content, 'received');
+                    break;
+                case 'private_message':
+                    addMessage(data.sender, data.content, 'private');
+                    break;
+                case 'user_joined':
+                    addMessage('System', `${data.username} joined the chat`, 'system');
+                    break;
+                case 'user_left':
+                    addMessage('System', `${data.username} left the chat`, 'system');
+                    break;
+                case 'user_list':
+                    onlineUsers = data.users;
+                    displayUserList();
+                    break;
+                case 'private_enabled':
+                    currentMode = 'private';
+                    privateReceiver = data.receiver;
+                    document.getElementById('statusText').textContent = username + ' • Private with ' + data.receiver;
+                    addMessage('System', `Private chat with ${data.receiver}`, 'system');
+                    break;
+                case 'group_enabled':
+                    currentMode = 'group';
+                    privateReceiver = '';
+                    document.getElementById('statusText').textContent = username + ' • Group Chat';
+                    addMessage('System', 'Switched to group chat', 'system');
+                    break;
+                case 'file':
+                    showFileSaveDialog(data.sender, data.fileName, data.fileData, data.fileSize);
+                    break;
+            }
+        }
+
+        function showFileSaveDialog(sender, fileName, fileData, fileSize) {
+            const modal = document.getElementById('fileModal');
+            const content = document.getElementById('fileDialogContent');
+            
+            content.innerHTML = `
+                <div class="file-dialog-info">
+                    <p><strong>Received file:</strong> ${fileName}</p>
+                    <p><strong>Size:</strong> ${formatFileSize(fileSize)}</p>
+                    <p><strong>From:</strong> ${sender}</p>
+                    <p>Save file?</p>
+                </div>
+                <div class="file-dialog-buttons">
+                    <button class="btn-dialog secondary" onclick="closeFileDialog(false, '${sender}', '${fileName}')">No</button>
+                    <button class="btn-dialog primary" onclick="saveFile('${fileName}', '${fileData}', '${sender}')">Yes</button>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+
+        function saveFile(fileName, fileData, sender) {
+            // Create a blob from the data URL
+            const byteString = atob(fileData.split(',')[1]);
+            const mimeString = fileData.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            
+            const blob = new Blob([ab], { type: mimeString });
+            const url = window.URL.createObjectURL(blob);
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            
+            // Cleanup
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            addMessage(sender, `📎 File received: ${fileName} - Saved`, 'received');
+            closeFileDialog(true, sender, fileName);
+        }
+
+        function closeFileDialog(saved, sender, fileName) {
+            const modal = document.getElementById('fileModal');
+            modal.style.display = 'none';
+            
+            if (!saved) {
+                addMessage(sender, `📎 File received: ${fileName} (not saved)`, 'received');
+            }
+        }
+
+        function addMessage(sender, content, type = 'received') {
+            const container = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            if (type !== 'system' && type !== 'sent') {
+                const senderDiv = document.createElement('div');
+                senderDiv.className = 'message-sender';
+                senderDiv.textContent = sender;
+                bubble.appendChild(senderDiv);
+            }
+
+            const contentDiv = document.createElement('div');
+            contentDiv.textContent = content;
+            bubble.appendChild(contentDiv);
+
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = time;
+            bubble.appendChild(timeDiv);
+
+            messageDiv.appendChild(bubble);
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message || !ws) return;
+
+            if (message.startsWith('/')) {
+                handleCommand(message);
+            } else {
+                ws.send(JSON.stringify({
+                    type: currentMode === 'private' ? 'private_message' : 'message',
+                    content: message,
+                    receiver: privateReceiver
+                }));
+                
+                addMessage('You', message, 'sent');
+            }
+
+            input.value = '';
+        }
+
+        function handleCommand(command) {
+            const parts = command.split(' ');
+            
+            switch(parts[0]) {
+                case '/list':
+                    ws.send(JSON.stringify({ type: 'list_users' }));
+                    showUserList();
+                    break;
+                case '/chat':
+                    if (parts[1]) {
+                        ws.send(JSON.stringify({
+                            type: 'enable_private',
+                            receiver: parts[1]
+                        }));
+                    }
+                    break;
+                case '/group':
+                    ws.send(JSON.stringify({ type: 'enable_group' }));
+                    break;
+                default:
+                    addMessage('System', 'Unknown command', 'system');
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function showUserList() {
+            ws.send(JSON.stringify({ type: 'list_users' }));
+            document.getElementById('userModal').style.display = 'flex';
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').style.display = 'none';
+        }
+
+        function displayUserList() {
+            const userListDiv = document.getElementById('userList');
+            userListDiv.innerHTML = '';
+
+            onlineUsers.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+
+                const userInfo = document.createElement('div');
+                userInfo.className = 'user-info';
+
+                const avatar = document.createElement('div');
+                avatar.className = 'user-avatar';
+                avatar.textContent = user[0].toUpperCase();
+
+                const userName = document.createElement('span');
+                userName.textContent = user;
+
+                userInfo.appendChild(avatar);
+                userInfo.appendChild(userName);
+                userItem.appendChild(userInfo);
+
+                if (user !== username) {
+                    const chatBtn = document.createElement('button');
+                    chatBtn.className = 'btn-chat';
+                    chatBtn.textContent = 'Chat';
+                    chatBtn.onclick = () => startPrivateChat(user);
+                    userItem.appendChild(chatBtn);
+                }
+
+                userListDiv.appendChild(userItem);
+            });
+        }
+
+        function startPrivateChat(user) {
+            ws.send(JSON.stringify({
+                type: 'enable_private',
+                receiver: user
+            }));
+            closeUserModal();
+        }
+
+        function enableGroupChat() {
+            ws.send(JSON.stringify({ type: 'enable_group' }));
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File too large! Maximum size is 10MB');
+                return;
+            }
+
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert('Not connected to server');
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                const fileData = e.target.result;
+                
+                const fileMessage = {
+                    type: 'file',
+                    fileName: file.name,
+                    fileData: fileData,
+                    fileSize: file.size,
+                    receiver: currentMode === 'private' ? privateReceiver : 'GROUP'
+                };
+
+                ws.send(JSON.stringify(fileMessage));
+                addMessage('You', `📎 File sent: ${file.name} (${formatFileSize(file.size)})`, 'sent');
+            };
+            
+            reader.onerror = (error) => {
+                alert('Failed to read file');
+            };
+            
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('usernameInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') connect();
+            });
+            document.getElementById('serverInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') connect();
+            });
+        });
+    </script>
+</body>
+</html>
