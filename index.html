@@ -1524,7 +1524,7 @@
                 case 'private_enabled':
                     currentMode = 'private';
                     privateReceiver = data.receiver;
-                    document.getElementById('statusText').textContent = username + ' • ' + data.receiver + ' ' + t.privateChat;
+                    document.getElementById('statusText').textContent = username + ' • ' + t.privateChat + ' ' + data.receiver;
                     addMessage('System', `${data.receiver} ${t.privateChat}`, 'system');
                     break;
                 case 'group_enabled':
@@ -1962,3 +1962,4 @@
 </body>
 
 </html>
+
