@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
     <title>அரட்டை</title>
     <style>
         * {
@@ -22,7 +23,13 @@
             transition: background 0.3s ease, color 0.3s ease;
         }
 
-        /* ===== LOGIN SCREEN ===== */
+        :lang(ta) {
+            font-family: 'Anek Tamil', sans-serif;
+            font-weight: 500;
+            line-height: 1.65;
+        }
+
+        /*  LOGIN SCREEN  */
         #loginScreen {
             display: flex;
             align-items: center;
@@ -139,7 +146,7 @@
             text-align: center;
         }
 
-        /* ===== CHAT SCREEN ===== */
+        /*  CHAT SCREEN  */
         #chatScreen {
             display: none;
             flex-direction: column;
@@ -222,7 +229,7 @@
             border-color: #22c55e;
         }
 
-        /* ===== MESSAGES ===== */
+        /*  MESSAGES  */
         .messages-container {
             flex: 1;
             padding: 30px;
@@ -317,7 +324,7 @@
             text-align: right;
         }
 
-        /* ===== INPUT CONTAINER ===== */
+        /*  INPUT CONTAINER  */
         .input-container {
             padding: 20px 30px;
             background: rgba(20, 20, 20, 0.95);
@@ -393,7 +400,7 @@
             transform: scale(1);
         }
 
-        /* ===== MODALS ===== */
+        /*  MODALS  */
         .modal {
             display: none;
             position: fixed;
@@ -596,7 +603,7 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        /* ===== ANIMATIONS ===== */
+        /*  ANIMATIONS  */
         @keyframes fadeSlideUp {
             from {
                 opacity: 0;
@@ -623,7 +630,7 @@
             }
         }
 
-        /* ===== LIGHT THEME ===== */
+        /*  LIGHT THEME  */
         body.light-theme {
             background: #f5f7fa;
             color: #1a1a1a;
@@ -913,11 +920,9 @@
             /* Chat screen should resize when keyboard appears */
             #chatScreen {
                 display: none;
-                /* Will be set to flex by JS */
                 flex-direction: column;
                 height: 100vh;
                 height: 100dvh;
-                /* Dynamic viewport height - adjusts for keyboard */
                 width: 100%;
                 position: relative;
             }
@@ -983,17 +988,15 @@
                 max-width: 90%;
             }
 
-            /* ===== CRITICAL: INPUT CONTAINER - STAYS ABOVE KEYBOARD ===== */
+            /*  CRITICAL: INPUT CONTAINER - STAYS ABOVE KEYBOARD  */
             .input-container {
                 padding: 15px;
                 gap: 10px;
                 flex-shrink: 0;
-                /* Remove fixed positioning - let it flow naturally */
                 position: relative;
                 bottom: 0;
                 width: 100%;
                 box-sizing: border-box;
-                /* Ensure it's always visible */
                 display: flex !important;
                 flex-direction: row;
                 align-items: center;
@@ -1016,7 +1019,6 @@
                 flex: 1;
                 padding: 12px 16px;
                 font-size: 16px;
-                /* Prevents zoom on iOS */
                 min-width: 0;
                 border-radius: 25px;
                 border: 2px solid rgba(224, 0, 0, 0.3);
@@ -1139,7 +1141,7 @@
             }
         }
 
-        /* ===== ACCESSIBILITY ===== */
+        /*  ACCESSIBILITY  */
         @media (prefers-reduced-motion: reduce) {
 
             *,
@@ -1151,7 +1153,7 @@
             }
         }
 
-        /* ===== FOCUS STATES ===== */
+        /*  FOCUS STATES  */
         button:focus-visible,
         input:focus-visible {
             outline: 2px solid #e00000;
@@ -1182,19 +1184,19 @@
         <div class="login-container">
             <div class="login-header">
                 <div class="login-icon">💬</div>
-                <h1>அரட்டை</h1>
-                <p>வாங்க… பேசலாம்</p>
+                <h1 lang="ta">அரட்டை</h1>
+                <p lang="ta">வாங்க… பேசலாம்😊</p>
             </div>
 
             <div class="form-group">
-                <label>Username</label>
+                <label lang="ta">உங்கள் பெயர்</label>
                 <input type="text" id="usernameInput" placeholder="பயனர் பெயரை உள்ளிடுங்கள்">
             </div>
 
             <button class="btn-primary" onclick="connect()">Connect</button>
 
             <!-- <p class="info-text">கட்டளைகள்: /list • /chat [user] • /group</p> -->
-            <p class="info-text" style="margin-top: 10px; font-size: 11px;">
+            <p class="info-text" style="margin-top: 10px; font-size: 11px;" lang="ta">
                 💡 தகவல்: இது ஒரு தனிப்பட்ட உரையாடல். பக்கத்தை புதுப்பித்தால் புதிய உரையாடல் தொடங்கும்.
             </p>
         </div>
@@ -1203,24 +1205,24 @@
     <div id="chatScreen">
         <div class="chat-header">
             <div class="chat-header-left">
-                <h2>Chat Application</h2>
+                <h2 lang="ta">அரட்டை</h2>
                 <div class="chat-status">
                     <div class="status-dot"></div>
-                    <span id="statusText">இணைக்கப்படுகிறது...</span>
+                    <span id="statusText" lang="ta">இணைக்கப்படுகிறது...</span>
                 </div>
             </div>
-            <div class="chat-header-right">
+            <div class="chat-header-right" lang="ta">
                 <button class="btn-secondary" onclick="showUserList()">
-                    👥 Users
+                    👥 உறுப்பினர்கள்
                 </button>
 
                 <button class="btn-secondary btn-success" onclick="enableGroupChat()">
-                    🌍 Group
+                    🌍 குழுமம்
                 </button>
 
 
                 <button class="btn-secondary" onclick="toggleTheme()">
-                    🌓 Theme
+                    🎨 தோற்றம்
                 </button>
             </div>
 
@@ -1624,7 +1626,7 @@
             });
         }
 
-        // Scroll to bottom when input is focused (like WhatsApp)
+        // Scroll to bottom when input is focused 
         document.getElementById('messageInput').addEventListener('focus', function () {
             setTimeout(() => {
                 const container = document.getElementById('messagesContainer');
@@ -1640,4 +1642,3 @@
 </body>
 
 </html>
-
