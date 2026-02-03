@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Chat Application</title>
     <style>
         * {
@@ -897,27 +898,31 @@
             background: rgba(100, 116, 139, 0.15);
         }
 
-        /* ===== MOBILE RESPONSIVENESS ===== */
         @media (max-width: 768px) {
 
-            /* Fix overall structure */
-            html,
+            /* Remove fixed positioning from body */
+            html {
+                height: 100%;
+            }
+
             body {
-                width: 100%;
                 height: 100%;
                 overflow: hidden;
-                position: fixed;
             }
 
+            /* Chat screen should resize when keyboard appears */
             #chatScreen {
+                display: none;
+                /* Will be set to flex by JS */
+                flex-direction: column;
+                height: 100vh;
+                height: 100dvh;
+                /* Dynamic viewport height - adjusts for keyboard */
                 width: 100%;
-                height: 100%;
-                position: fixed;
-                top: 0;
-                left: 0;
-                overflow: hidden;
+                position: relative;
             }
 
+            /* Login screen */
             .login-container {
                 padding: 35px 25px;
                 margin: 15px;
@@ -933,12 +938,12 @@
                 font-size: 26px;
             }
 
+            /* Chat header - should stay at top */
             .chat-header {
                 padding: 15px 20px;
                 flex-direction: column;
                 align-items: flex-start;
                 flex-shrink: 0;
-                height: auto;
             }
 
             .chat-header-left h2 {
@@ -958,13 +963,14 @@
                 white-space: nowrap;
             }
 
-            /* CRITICAL: Messages must allow scrolling but not overflow */
+            /* Messages container - should scroll and shrink when keyboard opens */
             .messages-container {
                 flex: 1;
                 min-height: 0;
                 padding: 20px 15px;
                 overflow-y: auto;
                 overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
             }
 
             .message-bubble {
@@ -977,56 +983,55 @@
                 max-width: 90%;
             }
 
-            /* ===== CRITICAL: INPUT CONTAINER FIX ===== */
-            /* This is the main fix for your issue */
+            /* ===== CRITICAL: INPUT CONTAINER - STAYS ABOVE KEYBOARD ===== */
             .input-container {
-                padding: 15px !important;
-                gap: 10px !important;
-                flex-shrink: 0 !important;
-                min-height: 70px !important;
-                max-height: 70px !important;
+                padding: 15px;
+                gap: 10px;
+                flex-shrink: 0;
+                /* Remove fixed positioning - let it flow naturally */
+                position: relative;
+                bottom: 0;
+                width: 100%;
+                box-sizing: border-box;
+                /* Ensure it's always visible */
                 display: flex !important;
-                flex-direction: row !important;
-                align-items: center !important;
-                width: 100% !important;
-                box-sizing: border-box !important;
-                position: relative !important;
-                z-index: 100 !important;
+                flex-direction: row;
+                align-items: center;
+                background: rgba(20, 20, 20, 0.95);
+                border-top: 2px solid rgba(224, 0, 0, 0.3);
             }
 
-            /* Make sure file input is hidden */
             #fileInput {
-                display: none !important;
+                display: none;
             }
 
-            /* Button icon - paperclip */
             .btn-icon {
-                width: 44px !important;
-                height: 44px !important;
-                font-size: 18px !important;
-                flex-shrink: 0 !important;
-                display: flex !important;
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+                flex-shrink: 0;
             }
 
-            /* Message input field */
             #messageInput {
-                flex: 1 !important;
-                padding: 12px 16px !important;
-                font-size: 14px !important;
-                min-width: 100px !important;
-                height: 44px !important;
-                display: block !important;
+                flex: 1;
+                padding: 12px 16px;
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+                min-width: 0;
+                border-radius: 25px;
+                border: 2px solid rgba(224, 0, 0, 0.3);
+                background: rgba(255, 255, 255, 0.05);
+                color: white;
             }
 
-            /* Send button */
             .btn-send {
-                width: 44px !important;
-                height: 44px !important;
-                font-size: 18px !important;
-                flex-shrink: 0 !important;
-                display: flex !important;
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+                flex-shrink: 0;
             }
 
+            /* Modal fixes */
             .modal-content {
                 width: 95%;
                 margin: 10px;
@@ -1050,6 +1055,21 @@
 
             .btn-dialog {
                 width: 100%;
+            }
+
+            .user-item {
+                padding: 12px;
+            }
+
+            .user-avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+
+            .btn-chat {
+                padding: 6px 15px;
+                font-size: 12px;
             }
         }
 
@@ -1082,24 +1102,9 @@
             .message-time {
                 font-size: 10px;
             }
-
-            .user-item {
-                padding: 12px;
-            }
-
-            .user-avatar {
-                width: 35px;
-                height: 35px;
-                font-size: 14px;
-            }
-
-            .btn-chat {
-                padding: 6px 15px;
-                font-size: 12px;
-            }
         }
 
-        /* ===== LANDSCAPE MODE FOR MOBILE ===== */
+        /* Landscape mode */
         @media (max-width: 768px) and (orientation: landscape) {
             .chat-header {
                 padding: 10px 15px;
@@ -1110,19 +1115,27 @@
             }
 
             .input-container {
-                padding: 10px 15px !important;
-                min-height: 60px !important;
-                max-height: 60px !important;
+                padding: 10px 15px;
             }
 
             .btn-send,
             .btn-icon {
-                width: 40px !important;
-                height: 40px !important;
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* Light theme mobile fixes */
+        @media (max-width: 768px) {
+            body.light-theme #messageInput {
+                background: rgba(100, 116, 139, 0.05);
+                border: 2px solid rgba(100, 116, 139, 0.2);
+                color: #1a1a1a;
             }
 
-            #messageInput {
-                height: 40px !important;
+            body.light-theme .input-container {
+                background: rgba(255, 255, 255, 0.95);
+                border-top: 2px solid rgba(100, 116, 139, 0.2);
             }
         }
 
@@ -1148,6 +1161,18 @@
         body.light-theme button:focus-visible,
         body.light-theme input:focus-visible {
             outline-color: #667eea;
+        }
+
+        @supports (padding: max(0px)) {
+            .input-container {
+                padding-bottom: max(15px, env(safe-area-inset-bottom));
+            }
+        }
+
+        body.keyboard-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
         }
     </style>
 </head>
@@ -1578,6 +1603,38 @@
                 if (e.key === 'Enter') connect();
             });
         });
+
+        // Keyboard detection and viewport adjustment
+        let viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+
+        // Listen for keyboard open/close
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                const currentHeight = window.visualViewport.height;
+                const heightDiff = viewportHeight - currentHeight;
+
+                // If height decreased significantly, keyboard is open
+                if (heightDiff > 100) {
+                    document.body.classList.add('keyboard-open');
+                } else {
+                    document.body.classList.remove('keyboard-open');
+                    viewportHeight = currentHeight;
+                }
+            });
+        }
+
+        // Scroll to bottom when input is focused (like WhatsApp)
+        document.getElementById('messageInput').addEventListener('focus', function () {
+            setTimeout(() => {
+                const container = document.getElementById('messagesContainer');
+                container.scrollTop = container.scrollHeight;
+            }, 300);
+        });
+
+        // Prevent page scroll when input is active
+        document.getElementById('messageInput').addEventListener('touchmove', function (e) {
+            e.stopPropagation();
+        }, { passive: true });
     </script>
 </body>
 
