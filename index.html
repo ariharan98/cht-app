@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Chat Application</title>
+    <title>அரட்டை</title>
     <style>
         * {
             margin: 0;
@@ -1182,8 +1182,8 @@
         <div class="login-container">
             <div class="login-header">
                 <div class="login-icon">💬</div>
-                <h1>Chat Application</h1>
-                <p>Connect and communicate instantly</p>
+                <h1>அரட்டை</h1>
+                <p>வாங்க… பேசலாம்</p>
             </div>
 
             <div class="form-group">
@@ -1193,9 +1193,9 @@
 
             <button class="btn-primary" onclick="connect()">Connect</button>
 
-            <p class="info-text">Commands: /list • /chat [user] • /group</p>
+            <!-- <p class="info-text">கட்டளைகள்: /list • /chat [user] • /group</p> -->
             <p class="info-text" style="margin-top: 10px; font-size: 11px;">
-                💡 Info: This is a private chat. Refreshing the page will start a new conversation.
+                💡 தகவல்: இது ஒரு தனிப்பட்ட உரையாடல். பக்கத்தை புதுப்பித்தால் புதிய உரையாடல் தொடங்கும்.
             </p>
         </div>
     </div>
@@ -1206,7 +1206,7 @@
                 <h2>Chat Application</h2>
                 <div class="chat-status">
                     <div class="status-dot"></div>
-                    <span id="statusText">Connecting...</span>
+                    <span id="statusText">இணைக்கப்படுகிறது...</span>
                 </div>
             </div>
             <div class="chat-header-right">
@@ -1316,7 +1316,7 @@
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('chatScreen').style.display = 'flex';
                     document.getElementById('statusText').textContent = username + ' • Group Chat';
-                    addMessage('System', 'Connected successfully!', 'system');
+                    addMessage('System', 'வெற்றிகரமாக இணைக்கப்பட்டது!', 'system');
                     break;
                 case 'auth_error':
                     alert(data.message);
@@ -1329,10 +1329,10 @@
                     addMessage(data.sender, data.content, 'private');
                     break;
                 case 'user_joined':
-                    addMessage('System', `${data.username} joined the chat`, 'system');
+                    addMessage('System', `${data.username} அரட்டையில் சேர்ந்தார்`, 'system');
                     break;
                 case 'user_left':
-                    addMessage('System', `${data.username} left the chat`, 'system');
+                    addMessage('System', `${data.username} அரட்டையிலிருந்து வெளியேறினார்`, 'system');
                     break;
                 case 'user_list':
                     onlineUsers = data.users;
@@ -1342,13 +1342,13 @@
                     currentMode = 'private';
                     privateReceiver = data.receiver;
                     document.getElementById('statusText').textContent = username + ' • Private with ' + data.receiver;
-                    addMessage('System', `Private chat with ${data.receiver}`, 'system');
+                    addMessage('System', `${data.receiver} உடன் தனிப்பட்ட உரையாடல்`, 'system');
                     break;
                 case 'group_enabled':
                     currentMode = 'group';
                     privateReceiver = '';
                     document.getElementById('statusText').textContent = username + ' • Group Chat';
-                    addMessage('System', 'Switched to group chat', 'system');
+                    addMessage('System', 'குழு உரையாடலுக்கு மாற்றப்பட்டது', 'system');
                     break;
                 case 'file':
                     showFileSaveDialog(data.sender, data.fileName, data.fileData, data.fileSize);
@@ -1362,14 +1362,14 @@
 
             content.innerHTML = `
                 <div class="file-dialog-info">
-                    <p><strong>Received file:</strong> ${fileName}</p>
-                    <p><strong>Size:</strong> ${formatFileSize(fileSize)}</p>
-                    <p><strong>From:</strong> ${sender}</p>
-                    <p>Save file?</p>
+                    <p><strong>பெறப்பட்ட கோப்பு:</strong> ${fileName}</p>
+                    <p><strong>அளவு:</strong> ${formatFileSize(fileSize)}</p>
+                    <p><strong>அனுப்பியவர்:</strong> ${sender}</p>
+                    <p>கோப்பை சேமிக்க வேண்டுமா?</p>
                 </div>
                 <div class="file-dialog-buttons">
-                    <button class="btn-dialog secondary" onclick="closeFileDialog(false, '${sender}', '${fileName}')">No</button>
-                    <button class="btn-dialog primary" onclick="saveFile('${fileName}', '${fileData}', '${sender}')">Yes</button>
+                    <button class="btn-dialog secondary" onclick="closeFileDialog(false, '${sender}', '${fileName}')">இல்லை</button>
+                    <button class="btn-dialog primary" onclick="saveFile('${fileName}', '${fileData}', '${sender}')">ஆம்</button>
                 </div>
             `;
 
@@ -1403,7 +1403,7 @@
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
 
-            addMessage(sender, `📎 File received: ${fileName} - Saved`, 'received');
+            addMessage(sender, `📎 கோப்பு : ${fileName} - வெற்றிகரமாக சேமிக்கப்பட்டது`, 'received');
             closeFileDialog(true, sender, fileName);
         }
 
@@ -1412,7 +1412,7 @@
             modal.style.display = 'none';
 
             if (!saved) {
-                addMessage(sender, `📎 File received: ${fileName} (not saved)`, 'received');
+                addMessage(sender, `📎 கோப்பு : ${fileName} - சேமிக்கப்படவில்லை`, 'received');
             }
         }
 
@@ -1557,14 +1557,13 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            if (file.size > 10 * 1024 * 1024) {
-                alert('File too large! Maximum size is 10MB');
-                return;
-            }
-
             if (!ws || ws.readyState !== WebSocket.OPEN) {
                 alert('Not connected to server');
                 return;
+            }
+
+            if (file.size > 50 * 1024 * 1024) {
+                addMessage('System', `பெரிய கோப்பு அனுப்பப்படுகிறது: ${file.name} (${formatFileSize(file.size)})... தயவுசெய்து காத்திருக்கவும்`, 'system');
             }
 
             const reader = new FileReader();
@@ -1593,9 +1592,11 @@
         }
 
         function formatFileSize(bytes) {
+            if (!bytes) return '0 B';
             if (bytes < 1024) return bytes + ' B';
             if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
-            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+            if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+            return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
         }
 
         document.addEventListener('DOMContentLoaded', () => {
