@@ -945,7 +945,7 @@
 
             /* Chat header - should stay at top */
             .chat-header {
-                padding: 15px 20px;
+                padding: 12px 16px;
                 flex-direction: column;
                 align-items: flex-start;
                 flex-shrink: 0;
@@ -960,11 +960,13 @@
                 justify-content: flex-start;
                 overflow-x: auto;
                 padding-bottom: 5px;
+                gap: 6px;
             }
 
             .btn-secondary {
-                padding: 8px 15px;
-                font-size: 13px;
+                padding: 6px 12px;
+                font-size: 12px;
+                border-radius: 8px;
                 white-space: nowrap;
             }
 
@@ -1317,7 +1319,7 @@
                 case 'auth_success':
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('chatScreen').style.display = 'flex';
-                    document.getElementById('statusText').textContent = username + ' • Group Chat';
+                    document.getElementById('statusText').textContent = username + ' • குழு உரையாடல்';
                     addMessage('System', 'வெற்றிகரமாக இணைக்கப்பட்டது!', 'system');
                     break;
                 case 'auth_error':
@@ -1343,13 +1345,13 @@
                 case 'private_enabled':
                     currentMode = 'private';
                     privateReceiver = data.receiver;
-                    document.getElementById('statusText').textContent = username + ' • Private with ' + data.receiver;
+                    document.getElementById('statusText').textContent = username + ' • உடன் தனிப்பட்ட உரையாடல் ' + data.receiver;
                     addMessage('System', `${data.receiver} உடன் தனிப்பட்ட உரையாடல்`, 'system');
                     break;
                 case 'group_enabled':
                     currentMode = 'group';
                     privateReceiver = '';
-                    document.getElementById('statusText').textContent = username + ' • Group Chat';
+                    document.getElementById('statusText').textContent = username + ' • குழு உரையாடல்';
                     addMessage('System', 'குழு உரையாடலுக்கு மாற்றப்பட்டது', 'system');
                     break;
                 case 'file':
