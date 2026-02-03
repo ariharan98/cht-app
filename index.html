@@ -1146,40 +1146,6 @@
             .chat-header-right {
                 gap: 8px;
             }
-
-            /*.icon-btn {
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                gap: 6px;
-                padding: 8px 6px;
-                min-width: 64px;
-                min-height: 56px;
-                border-radius: 14px;
-                border: 1px solid rgba(224, 0, 0, 0.45);
-                background: linear-gradient(180deg,
-                        rgba(224, 0, 0, 0.20),
-                        rgba(224, 0, 0, 0.08));
-            }
-
-            .icon-btn .icon {
-                font-size: 16px;
-                line-height: 1;
-            }
-
-            .icon-btn .label {
-                font-size: 9px;
-                font-weight: 500;
-                line-height: 1.2;
-                text-align: center;
-                white-space: normal;
-                word-break: keep-all;
-                max-width: 70px;
-                opacity: 0.95;
-                color: #888;
-            }*/
-
-            /* ICON ONLY BUTTONS */
             .icon-btn {
                 padding: 6px;
                 min-width: 38px;
@@ -1477,6 +1443,7 @@
                     const t = translations[currentLanguage];
                     addMessage('System', t.disconnected, 'system');
                     document.getElementById('statusText').textContent = t.disconnected;
+                    location.reload(); 
                 };
 
 
@@ -1962,4 +1929,5 @@
 </body>
 
 </html>
+
 
