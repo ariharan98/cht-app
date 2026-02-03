@@ -29,7 +29,6 @@
             line-height: 1.65;
         }
 
-        /*  LOGIN SCREEN  */
         #loginScreen {
             display: flex;
             align-items: center;
@@ -147,7 +146,6 @@
             text-align: center;
         }
 
-        /*  CHAT SCREEN  */
         #chatScreen {
             display: none;
             flex-direction: column;
@@ -220,7 +218,6 @@
             transform: translateY(-2px);
         }
 
-        /*  MESSAGES  */
         .messages-container {
             flex: 1;
             padding: 30px;
@@ -315,7 +312,6 @@
             text-align: right;
         }
 
-        /*  INPUT CONTAINER  */
         .input-container {
             padding: 20px 30px;
             background: rgba(20, 20, 20, 0.95);
@@ -391,7 +387,6 @@
             transform: scale(1);
         }
 
-        /*  MODALS  */
         .modal {
             display: none;
             position: fixed;
@@ -621,7 +616,6 @@
             line-height: 1.65;
         }
 
-        /*  ANIMATIONS  */
         @keyframes fadeSlideUp {
             from {
                 opacity: 0;
@@ -648,7 +642,7 @@
             }
         }
 
-        /*  LIGHT THEME  */
+
         body.light-theme {
             background: #f5f7fa;
             color: #1a1a1a;
@@ -1006,7 +1000,6 @@
                 border-radius: 12px;
                 border: 1px solid rgba(224, 0, 0, 0.45);
                 background: rgba(224, 0, 0, 0.08);
-                box-sizing: border-box;
                 white-space: nowrap;
             }
 
@@ -1114,39 +1107,155 @@
         }
 
 
-
         @media (max-width: 480px) {
-            .login-container {
-                padding: 30px 20px;
+
+            html,
+            body {
+                height: 100%;
+                overflow: hidden;
             }
 
-            .login-header h1 {
-                font-size: 24px;
+            #chatScreen {
+                display: flex;
+                flex-direction: column;
+                height: 100dvh;
+                width: 100%;
+            }
+
+            .chat-header {
+                padding: 6px 10px;
+                gap: 6px;
             }
 
             .chat-header-left h2 {
-                font-size: 16px;
+                font-size: 15px;
+                font-weight: 600;
             }
 
             .chat-status {
-                font-size: 12px;
+                font-size: 10px;
+                opacity: 0.75;
+            }
+
+            .chat-header-right {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .chat-header-right {
+                gap: 8px;
+            }
+
+            .icon-btn {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 6px;
+                min-width: 64px;
+                min-height: 56px;
+                border-radius: 14px;
+                border: 1px solid rgba(224, 0, 0, 0.45);
+                background: linear-gradient(180deg,
+                        rgba(224, 0, 0, 0.20),
+                        rgba(224, 0, 0, 0.08));
+            }
+
+            .icon-btn .icon {
+                font-size: 16px;
+                line-height: 1;
+            }
+
+            .icon-btn .label {
+                font-size: 9px;
+                font-weight: 500;
+                line-height: 1.2;
+                text-align: center;
+                white-space: normal;
+                word-break: keep-all;
+                max-width: 70px;
+                opacity: 0.95;
+                color: #888;
+            }
+
+            .messages-container {
+                flex: 1;
+                min-height: 0;
+                padding: 14px 10px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             }
 
             .message-bubble {
-                max-width: 85%;
+                max-width: 86%;
+                font-size: 13.5px;
+                padding: 9px 13px;
+                border-radius: 16px;
+            }
+
+            .message.system .message-bubble {
+                max-width: 92%;
+                font-size: 12px;
+            }
+
+
+            .input-container {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px;
+                background: rgba(20, 20, 20, 0.95);
+                border-top: 1px solid rgba(224, 0, 0, 0.25);
+            }
+
+            .btn-icon,
+            .btn-send {
+                width: 40px;
+                height: 40px;
+                font-size: 17px;
+                flex-shrink: 0;
+            }
+
+            #messageInput {
+                flex: 1;
+                padding: 10px 14px;
+                font-size: 15px;
+                border-radius: 22px;
+            }
+
+            .modal-content {
+                width: 94%;
+                margin: 8px;
+                border-radius: 16px;
+            }
+
+            .modal-header {
+                padding: 12px 16px;
+            }
+
+            .modal-header h3 {
+                font-size: 16px;
+            }
+
+            .user-item {
+                padding: 10px;
+            }
+
+            .user-avatar {
+                width: 32px;
+                height: 32px;
                 font-size: 13px;
             }
 
-            .message-sender {
+            .btn-chat {
+                padding: 5px 12px;
                 font-size: 11px;
-            }
-
-            .message-time {
-                font-size: 10px;
+                border-radius: 6px;
             }
         }
 
-        /* Landscape mode */
+
         @media (max-width: 768px) and (orientation: landscape) {
             .chat-header {
                 padding: 10px 15px;
@@ -1167,7 +1276,6 @@
             }
         }
 
-        /* Light theme mobile fixes */
         @media (max-width: 768px) {
             body.light-theme #messageInput {
                 background: rgba(100, 116, 139, 0.05);
@@ -1181,7 +1289,6 @@
             }
         }
 
-        /*  ACCESSIBILITY  */
         @media (prefers-reduced-motion: reduce) {
 
             *,
@@ -1193,7 +1300,6 @@
             }
         }
 
-        /*  FOCUS STATES  */
         button:focus-visible,
         input:focus-visible {
             outline: 2px solid #e00000;
@@ -1401,7 +1507,7 @@
                 case 'private_enabled':
                     currentMode = 'private';
                     privateReceiver = data.receiver;
-                    document.getElementById('statusText').textContent = username + ' • ' + t.privateChat + ' ' + data.receiver;
+                    document.getElementById('statusText').textContent = username + ' • ' + data.receiver + ' ' + t.privateChat;
                     addMessage('System', `${data.receiver} ${t.privateChat}`, 'system');
                     break;
                 case 'group_enabled':
@@ -1451,16 +1557,14 @@
             const blob = new Blob([ab], { type: mimeString });
             const url = window.URL.createObjectURL(blob);
 
-            // Create download link
             const link = document.createElement('a');
             link.href = url;
             link.download = fileName;
 
-            // Trigger download
+
             document.body.appendChild(link);
             link.click();
 
-            // Cleanup
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
 
@@ -1763,7 +1867,6 @@
 
             document.documentElement.lang = currentLanguage;
 
-            // Login screen
             document.getElementById('appTitle').textContent = t.appTitle;
             document.getElementById('appSubtitle').textContent = t.appSubtitle;
             document.getElementById('usernameLabel').textContent = t.usernameLabel;
@@ -1774,7 +1877,6 @@
             document.getElementById('statusText').textContent = t.connecting;
 
 
-            // Chat screen
             document.getElementById('chatTitle').textContent = t.chatTitle;
             document.getElementById('usersBtnText').textContent = t.usersBtn;
             document.getElementById('groupBtnText').textContent = t.groupBtn;
@@ -1786,7 +1888,6 @@
 
 
 
-            // Update status if connected
             if (username && currentMode === 'group') {
                 document.getElementById('statusText').textContent = username + ' • ' + t.groupChat;
             } else if (username && currentMode === 'private') {
@@ -1814,16 +1915,13 @@
             });
         });
 
-        // Keyboard detection and viewport adjustment
         let viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
 
-        // Listen for keyboard open/close
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', () => {
                 const currentHeight = window.visualViewport.height;
                 const heightDiff = viewportHeight - currentHeight;
 
-                // If height decreased significantly, keyboard is open
                 if (heightDiff > 100) {
                     document.body.classList.add('keyboard-open');
                 } else {
@@ -1833,7 +1931,6 @@
             });
         }
 
-        // Scroll to bottom when input is focused 
         document.getElementById('messageInput').addEventListener('focus', function () {
             setTimeout(() => {
                 const container = document.getElementById('messagesContainer');
@@ -1841,7 +1938,6 @@
             }, 300);
         });
 
-        // Prevent page scroll when input is active
         document.getElementById('messageInput').addEventListener('touchmove', function (e) {
             e.stopPropagation();
         }, { passive: true });
