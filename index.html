@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
@@ -48,6 +48,7 @@
             max-width: 450px;
             width: 100%;
             backdrop-filter: blur(10px);
+            position: relative;
         }
 
         .login-icon {
@@ -603,6 +604,33 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(224, 0, 0, 0.2);
+            border: 2px solid rgba(224, 0, 0, 0.3);
+            border-radius: 25px;
+            padding: 8px 16px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .language-toggle:hover {
+            background: rgba(224, 0, 0, 0.3);
+            border-color: #e00000;
+            transform: translateY(-2px);
+        }
+
+        body.tamil {
+            font-family: 'Anek Tamil', sans-serif;
+            font-weight: 500;
+            line-height: 1.65;
+        }
+
         /*  ANIMATIONS  */
         @keyframes fadeSlideUp {
             from {
@@ -905,6 +933,25 @@
             background: rgba(100, 116, 139, 0.15);
         }
 
+        body.light-theme .language-toggle {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+            color: #667eea;
+        }
+
+        body.light-theme .language-toggle:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .language-toggle {
+            top: 15px;
+            right: 15px;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+
         @media (max-width: 768px) {
 
             /* Remove fixed positioning from body */
@@ -1184,21 +1231,24 @@
 <body>
     <div id="loginScreen">
         <div class="login-container">
+            <button class="language-toggle" onclick="toggleLanguage()">
+                <span id="langToggleText">English</span>
+            </button>
             <div class="login-header">
                 <div class="login-icon">💬</div>
-                <h1 lang="ta">அரட்டை</h1>
-                <p lang="ta">வாங்க… பேசலாம்😊</p>
+                <h1 id="appTitle">அரட்டை</h1>
+                <p id="appSubtitle">வாங்க… பேசலாம்😊</p>
             </div>
 
             <div class="form-group">
-                <label lang="ta">உங்கள் பெயர்</label>
+                <label id="usernameLabel">உங்கள் பெயர்</label>
                 <input type="text" id="usernameInput" placeholder="பயனர் பெயரை உள்ளிடுங்கள்">
             </div>
 
-            <button class="btn-primary" onclick="connect()">Connect</button>
+            <button class="btn-primary" onclick="connect()" id="connectBtn">Connect</button>
 
             <!-- <p class="info-text">கட்டளைகள்: /list • /chat [user] • /group</p> -->
-            <p class="info-text" style="margin-top: 10px; font-size: 11px;" lang="ta">
+            <p class="info-text" id="infoText" style="margin-top: 10px; font-size: 11px;">
                 💡 தகவல்: இது ஒரு தனிப்பட்ட உரையாடல். பக்கத்தை புதுப்பித்தால் புதிய உரையாடல் தொடங்கும்.
             </p>
         </div>
@@ -1207,7 +1257,7 @@
     <div id="chatScreen">
         <div class="chat-header">
             <div class="chat-header-left">
-                <h2 lang="ta">அரட்டை</h2>
+                <h2 id="chatTitle">அரட்டை</h2>
                 <div class="chat-status">
                     <div class="status-dot"></div>
                     <span id="statusText" lang="ta">இணைக்கப்படுகிறது...</span>
@@ -1215,16 +1265,16 @@
             </div>
             <div class="chat-header-right" lang="ta">
                 <button class="btn-secondary" onclick="showUserList()">
-                    👥 உறுப்பினர்கள்
+                    👥 <span id="usersBtnText">உறுப்பினர்கள்</span>
                 </button>
-
                 <button class="btn-secondary btn-success" onclick="enableGroupChat()">
-                    🌍 குழுமம்
+                    🌍 <span id="groupBtnText">குழுமம்</span>
                 </button>
-
-
                 <button class="btn-secondary" onclick="toggleTheme()">
-                    🎨 தோற்றம்
+                    🎨 <span id="themeBtnText">தோற்றம்</span>
+                </button>
+                <button class="btn-secondary" onclick="toggleLanguage()">
+                    🌐 <span id="langToggleChatText">English</span>
                 </button>
             </div>
 
@@ -1247,7 +1297,7 @@
     <div id="userModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Online Users</h3>
+                <h3 id="modalTitle">தற்போது இணைந்துள்ள பயனர்கள்</h3>
                 <button class="btn-close" onclick="closeUserModal()">×</button>
             </div>
             <div id="userList"></div>
@@ -1257,7 +1307,7 @@
     <div id="fileModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Incoming File</h3>
+                <h3 id="fileModalTitle">Incoming File</h3>
             </div>
             <div class="file-dialog" id="fileDialogContent"></div>
         </div>
@@ -1269,6 +1319,7 @@
         let currentMode = 'group';
         let privateReceiver = '';
         let onlineUsers = [];
+        let currentLanguage = 'ta';
 
         function connect() {
             username = document.getElementById('usernameInput').value.trim();
@@ -1276,7 +1327,7 @@
             const serverUrl = SERVER_URL;
 
             if (!username) {
-                alert('தயவுசெய்து உங்கள் பெயரை உள்ளிடுங்கள்');
+                alert(translations[currentLanguage].enterNameAlert);
                 return;
             }
 
@@ -1295,14 +1346,18 @@
                     handleMessage(data);
                 };
 
-                ws.onerror = (error) => {
-                    addMessage('System', 'Connection error occurred', 'system');
+                ws.onerror = () => {
+                    const t = translations[currentLanguage];
+                    addMessage('System', t.connectionError, 'system');
                 };
 
                 ws.onclose = () => {
-                    addMessage('System', 'Disconnected from server', 'system');
-                    document.getElementById('statusText').textContent = 'Disconnected';
+                    const t = translations[currentLanguage];
+                    addMessage('System', t.disconnected, 'system');
+                    document.getElementById('statusText').textContent = t.disconnected;
                 };
+
+
 
             } catch (error) {
                 alert('Failed to connect: ' + error.message);
@@ -1315,12 +1370,14 @@
 
 
         function handleMessage(data) {
+            const t = translations[currentLanguage];
+
             switch (data.type) {
                 case 'auth_success':
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('chatScreen').style.display = 'flex';
-                    document.getElementById('statusText').textContent = username + ' • குழு உரையாடல்';
-                    addMessage('System', 'வெற்றிகரமாக இணைக்கப்பட்டது!', 'system');
+                    document.getElementById('statusText').textContent = username + ' • ' + t.groupChat;
+                    addMessage('System', t.connectedSuccess, 'system');
                     break;
                 case 'auth_error':
                     alert(data.message);
@@ -1333,10 +1390,10 @@
                     addMessage(data.sender, data.content, 'private');
                     break;
                 case 'user_joined':
-                    addMessage('System', `${data.username} அரட்டையில் சேர்ந்தார்`, 'system');
+                    addMessage('System', `${data.username} ${t.userJoined}`, 'system');
                     break;
                 case 'user_left':
-                    addMessage('System', `${data.username} அரட்டையிலிருந்து வெளியேறினார்`, 'system');
+                    addMessage('System', `${data.username} ${t.userLeft}`, 'system');
                     break;
                 case 'user_list':
                     onlineUsers = data.users;
@@ -1345,14 +1402,14 @@
                 case 'private_enabled':
                     currentMode = 'private';
                     privateReceiver = data.receiver;
-                    document.getElementById('statusText').textContent = username + ' • உடன் தனிப்பட்ட உரையாடல் ' + data.receiver;
-                    addMessage('System', `${data.receiver} உடன் தனிப்பட்ட உரையாடல்`, 'system');
+                    document.getElementById('statusText').textContent = username + ' • ' + t.privateChat + ' ' + data.receiver;
+                    addMessage('System', `${data.receiver} ${t.privateChat}`, 'system');
                     break;
                 case 'group_enabled':
                     currentMode = 'group';
                     privateReceiver = '';
-                    document.getElementById('statusText').textContent = username + ' • குழு உரையாடல்';
-                    addMessage('System', 'குழு உரையாடலுக்கு மாற்றப்பட்டது', 'system');
+                    document.getElementById('statusText').textContent = username + ' • ' + t.groupChat;
+                    addMessage('System', t.switchedToGroup, 'system');
                     break;
                 case 'file':
                     showFileSaveDialog(data.sender, data.fileName, data.fileData, data.fileSize);
@@ -1363,17 +1420,18 @@
         function showFileSaveDialog(sender, fileName, fileData, fileSize) {
             const modal = document.getElementById('fileModal');
             const content = document.getElementById('fileDialogContent');
+            const t = translations[currentLanguage];
 
             content.innerHTML = `
                 <div class="file-dialog-info">
-                    <p><strong>பெறப்பட்ட கோப்பு:</strong> ${fileName}</p>
-                    <p><strong>அளவு:</strong> ${formatFileSize(fileSize)}</p>
-                    <p><strong>அனுப்பியவர்:</strong> ${sender}</p>
-                    <p>கோப்பை சேமிக்க வேண்டுமா?</p>
+                    <p><strong>${t.receivedFile}:</strong> ${fileName}</p>
+                    <p><strong>${t.fileSize}:</strong> ${formatFileSize(fileSize)}</p>
+                    <p><strong>${t.sender}:</strong> ${sender}</p>
+                    <p>${t.saveFileConfirm}</p>
                 </div>
                 <div class="file-dialog-buttons">
-                    <button class="btn-dialog secondary" onclick="closeFileDialog(false, '${sender}', '${fileName}')">இல்லை</button>
-                    <button class="btn-dialog primary" onclick="saveFile('${fileName}', '${fileData}', '${sender}')">ஆம்</button>
+                    <button class="btn-dialog secondary" onclick="closeFileDialog(false, '${sender}', '${fileName}')">${t.no}</button>
+                    <button class="btn-dialog primary" onclick="saveFile('${fileName}', '${fileData}', '${sender}')">${t.yes}</button>
                 </div>
             `;
 
@@ -1407,7 +1465,7 @@
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
 
-            addMessage(sender, `📎 கோப்பு : ${fileName} - வெற்றிகரமாக சேமிக்கப்பட்டது`, 'received');
+            addMessage(sender, `${translations[currentLanguage].file} : ${fileName} ${translations[currentLanguage].fileSaved}`, 'received');
             closeFileDialog(true, sender, fileName);
         }
 
@@ -1416,7 +1474,7 @@
             modal.style.display = 'none';
 
             if (!saved) {
-                addMessage(sender, `📎 கோப்பு : ${fileName} - சேமிக்கப்படவில்லை`, 'received');
+                addMessage(sender, `${translations[currentLanguage].file} : ${fileName} ${translations[currentLanguage].fileNotSaved}`, 'received');
             }
         }
 
@@ -1466,7 +1524,7 @@
                     receiver: privateReceiver
                 }));
 
-                addMessage('You', message, 'sent');
+                addMessage(translations[currentLanguage].you, message, 'sent');
             }
 
             input.value = '';
@@ -1492,7 +1550,7 @@
                     ws.send(JSON.stringify({ type: 'enable_group' }));
                     break;
                 default:
-                    addMessage('System', 'Unknown command', 'system');
+                    addMessage('System', translations[currentLanguage].unknownCommand, 'system');
             }
         }
 
@@ -1536,7 +1594,7 @@
                 if (user !== username) {
                     const chatBtn = document.createElement('button');
                     chatBtn.className = 'btn-chat';
-                    chatBtn.textContent = 'Chat';
+                    chatBtn.textContent = translations[currentLanguage].chatBtn;
                     chatBtn.onclick = () => startPrivateChat(user);
                     userItem.appendChild(chatBtn);
                 }
@@ -1562,12 +1620,17 @@
             if (!file) return;
 
             if (!ws || ws.readyState !== WebSocket.OPEN) {
-                alert('Not connected to server');
+                alert(translations[currentLanguage].notConnected);
                 return;
             }
 
             if (file.size > 50 * 1024 * 1024) {
-                addMessage('System', `பெரிய கோப்பு அனுப்பப்படுகிறது: ${file.name} (${formatFileSize(file.size)})... தயவுசெய்து காத்திருக்கவும்`, 'system');
+                addMessage(
+                    'System',
+                    `${translations[currentLanguage].largeFileSending}${file.name} (${formatFileSize(file.size)})${translations[currentLanguage].pleaseWait}`,
+                    'system'
+                );
+
             }
 
             const reader = new FileReader();
@@ -1584,11 +1647,14 @@
                 };
 
                 ws.send(JSON.stringify(fileMessage));
-                addMessage('You', `📎 File sent: ${file.name} (${formatFileSize(file.size)})`, 'sent');
+                addMessage(translations[currentLanguage].you,
+                    `${translations[currentLanguage].fileSent}: ${file.name} (${formatFileSize(file.size)})`,
+                    'sent'
+                );
             };
 
             reader.onerror = (error) => {
-                alert('Failed to read file');
+                alert(translations[currentLanguage].fileReadError);
             };
 
             reader.readAsDataURL(file);
@@ -1603,7 +1669,147 @@
             return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
         }
 
+        const translations = {
+            en: {
+                appTitle: 'Chat Application',
+                appSubtitle: 'Connect and communicate instantly',
+                usernameLabel: 'Username',
+                usernamePlaceholder: 'Enter your username',
+                infoText: '💡 Info: This is a private chat. Refreshing the page will start a new conversation.',
+                langToggle: 'தமிழ்',
+                chatTitle: 'Chat Application',
+                connecting: 'Connecting...',
+                usersBtn: 'Users',
+                groupBtn: 'Group',
+                themeBtn: 'Theme',
+                modalTitle: 'Online Users',
+                groupChat: 'Group Chat',
+                privateChat: 'Private with',
+                connectedSuccess: 'Connected successfully!',
+                userJoined: 'joined the chat',
+                userLeft: 'left the chat',
+                switchedToGroup: 'Switched to group chat',
+                enterNameAlert: 'Please enter your name',
+                unknownCommand: 'Unknown command',
+                notConnected: 'Not connected to server',
+                file: '📎 File',
+                fileSaved: ' - saved successfully',
+                fileNotSaved: ' - was not saved',
+                largeFileSending: 'Large file is being sent : ',
+                pleaseWait: ' Please wait...',
+                incomingFile: 'Incoming File',
+                receivedFile: 'Received file',
+                fileSize: 'Size',
+                sender: 'Sender',
+                saveFileConfirm: 'Do you want to save this file?',
+                yes: 'Yes',
+                no: 'No',
+                connectBtn: 'Connect',
+                typeMessage: 'Type a message...',
+                chatBtn: 'Chat',
+                incomingFileTitle: 'Incoming File',
+                connectionError: 'Connection error occurred',
+                disconnected: 'Disconnected',
+                fileSent: '📎 File sent',
+                fileReadError: 'Failed to read file',
+            },
+            ta: {
+                appTitle: 'அரட்டை',
+                appSubtitle: 'வாங்க… பேசலாம்😊',
+                usernameLabel: 'உங்கள் பெயர்',
+                usernamePlaceholder: 'பயனர் பெயரை உள்ளிடுங்கள்',
+                infoText: '💡 தகவல்: இது ஒரு தனிப்பட்ட உரையாடல். பக்கத்தை புதுப்பித்தால் புதிய உரையாடல் தொடங்கும்.',
+                langToggle: 'English',
+                chatTitle: 'அரட்டை',
+                connecting: 'இணைக்கப்படுகிறது...',
+                usersBtn: 'உறுப்பினர்கள்',
+                groupBtn: 'குழுமம்',
+                themeBtn: 'தோற்றம்',
+                modalTitle: 'தற்போது இணைந்துள்ள பயனர்கள்',
+                groupChat: 'குழு உரையாடல்',
+                privateChat: 'உடன் தனிப்பட்ட உரையாடல்',
+                connectedSuccess: 'வெற்றிகரமாக இணைக்கப்பட்டது!',
+                userJoined: 'அரட்டையில் சேர்ந்தார்',
+                userLeft: 'அரட்டையிலிருந்து வெளியேறினார்',
+                switchedToGroup: 'குழு உரையாடலுக்கு மாற்றப்பட்டது',
+                enterNameAlert: 'தயவுசெய்து உங்கள் பெயரை உள்ளிடுங்கள்',
+                unknownCommand: 'அறியப்படாத கட்டளை',
+                notConnected: 'சர்வருடன் இணைக்கப்படவில்லை',
+                file: '📎 கோப்பு',
+                fileSaved: ' - வெற்றிகரமாக சேமிக்கப்பட்டது',
+                fileNotSaved: ' - சேமிக்கப்படவில்லை',
+                largeFileSending: 'பெரிய கோப்பு அனுப்பப்படுகிறது : ',
+                pleaseWait: ' தயவுசெய்து காத்திருக்கவும்...',
+                incomingFile: 'பெறப்பட்ட கோப்பு',
+                receivedFile: 'கோப்பு பெறப்பட்டது',
+                fileSize: 'அளவு',
+                sender: 'அனுப்பியவர்',
+                saveFileConfirm: 'கோப்பை சேமிக்க வேண்டுமா?',
+                yes: 'ஆம்',
+                no: 'இல்லை',
+                connectBtn: 'இணைக்கவும்',
+                typeMessage: 'செய்தியை உள்ளிடுங்கள்...',
+                chatBtn: 'அரட்டை',
+                incomingFileTitle: 'பெறப்பட்ட கோப்பு',
+                connectionError: 'இணைப்பு பிழை ஏற்பட்டது',
+                disconnected: 'துண்டிக்கப்பட்டது',
+                fileSent: '📎 கோப்பு அனுப்பப்பட்டது',
+                fileReadError: 'கோப்பை படிக்க முடியவில்லை',
+            }
+        };
+
+        function updateUILanguage() {
+
+            const t = translations[currentLanguage];
+
+            document.documentElement.lang = currentLanguage;
+
+            // Login screen
+            document.getElementById('appTitle').textContent = t.appTitle;
+            document.getElementById('appSubtitle').textContent = t.appSubtitle;
+            document.getElementById('usernameLabel').textContent = t.usernameLabel;
+            document.getElementById('usernameInput').placeholder = t.usernamePlaceholder;
+            document.getElementById('infoText').textContent = t.infoText;
+            document.getElementById('langToggleText').textContent = t.langToggle;
+            document.getElementById('connectBtn').textContent = t.connectBtn;
+            document.getElementById('statusText').textContent = t.connecting;
+
+
+            // Chat screen
+            document.getElementById('chatTitle').textContent = t.chatTitle;
+            document.getElementById('usersBtnText').textContent = t.usersBtn;
+            document.getElementById('groupBtnText').textContent = t.groupBtn;
+            document.getElementById('themeBtnText').textContent = t.themeBtn;
+            document.getElementById('langToggleChatText').textContent = t.langToggle;
+            document.getElementById('modalTitle').textContent = t.modalTitle;
+            document.getElementById('messageInput').placeholder = t.typeMessage;
+            document.getElementById('fileModalTitle').textContent = t.incomingFileTitle;
+
+
+
+            // Update status if connected
+            if (username && currentMode === 'group') {
+                document.getElementById('statusText').textContent = username + ' • ' + t.groupChat;
+            } else if (username && currentMode === 'private') {
+                document.getElementById('statusText').textContent = username + ' • ' + t.privateChat + ' ' + privateReceiver;
+            }
+        }
+
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'ta' : 'en';
+            updateUILanguage();
+
+            if (currentLanguage === 'ta') {
+                document.body.classList.add('tamil');
+            } else {
+                document.body.classList.remove('tamil');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.add('tamil');
+            updateUILanguage();
             document.getElementById('usernameInput').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') connect();
             });
