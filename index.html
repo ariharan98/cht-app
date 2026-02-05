@@ -705,6 +705,190 @@
             position: relative;
         }
 
+
+        .btn-call {
+            padding: 8px 16px;
+            background: rgba(34, 197, 94, 0.2);
+            border: 2px solid #22c55e;
+            border-radius: 8px;
+            color: #22c55e;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-call:hover {
+            background: rgba(34, 197, 94, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+
+        .call-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+
+        .call-container {
+            background: rgba(20, 20, 20, 0.98);
+            border-radius: 30px;
+            border: 2px solid rgba(224, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: callSlideIn 0.4s ease-out;
+        }
+
+        @keyframes callSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .call-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #e00000, #ff6347);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
+            margin: 0 auto 20px;
+            animation: avatarPulse 2s infinite;
+        }
+
+        @keyframes avatarPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(224, 0, 0, 0.7);
+            }
+
+            50% {
+                box-shadow: 0 0 0 20px rgba(224, 0, 0, 0);
+            }
+        }
+
+        .call-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .call-status {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .call-timer {
+            font-size: 24px;
+            color: #22c55e;
+            font-weight: 600;
+            margin-bottom: 30px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .call-controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .call-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .call-btn.mute {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .call-btn.mute:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .call-btn.mute.active {
+            background: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .call-btn.end {
+            background: linear-gradient(45deg, #dc2626, #ef4444);
+            color: white;
+        }
+
+        .call-btn.end:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 25px rgba(220, 38, 38, 0.5);
+        }
+
+        .call-btn.accept {
+            background: linear-gradient(45deg, #16a34a, #22c55e);
+            color: white;
+        }
+
+        .call-btn.accept:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 25px rgba(22, 163, 74, 0.5);
+        }
+
+        .call-btn.reject {
+            background: linear-gradient(45deg, #dc2626, #ef4444);
+            color: white;
+        }
+
+        .call-btn.reject:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 25px rgba(220, 38, 38, 0.5);
+        }
+
+        .incoming-call-controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
         @keyframes fadeSlideUp {
             from {
                 opacity: 0;
@@ -1018,16 +1202,54 @@
             scrollbar-color: rgba(102, 126, 234, 0.45) transparent;
         }
 
+        /* Add these inside body.light-theme { } section */
+
+        body.light-theme .btn-call {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: #22c55e;
+            color: #16a34a;
+        }
+
+        body.light-theme .btn-call:hover {
+            background: rgba(34, 197, 94, 0.2);
+        }
+
+        body.light-theme .call-modal {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        body.light-theme .call-container {
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid rgba(100, 116, 139, 0.2);
+        }
+
+        body.light-theme .call-avatar {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        body.light-theme .call-name {
+            color: #1a1a1a;
+        }
+
+        body.light-theme .call-status {
+            color: #64748b;
+        }
+
+        body.light-theme .call-btn.mute {
+            background: rgba(100, 116, 139, 0.1);
+            color: #475569;
+        }
+
+        body.light-theme .call-btn.mute:hover {
+            background: rgba(100, 116, 139, 0.2);
+        }
+
         .language-toggle {
             top: 15px;
             right: 15px;
             padding: 6px 12px;
             font-size: 12px;
         }
-
-        /* body.preview-open {
-            overflow: hidden;
-        } */
 
 
         @media (max-width: 768px) {
@@ -1236,6 +1458,52 @@
                 font-size: 13px;
                 line-height: 1.5;
             }
+
+            .call-container {
+                padding: 30px 25px;
+                max-width: 95%;
+            }
+
+            .call-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 40px;
+            }
+
+            .call-name {
+                font-size: 24px;
+            }
+
+            .call-status {
+                font-size: 14px;
+            }
+
+            .call-timer {
+                font-size: 20px;
+            }
+
+            .call-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+
+            .user-item {
+                padding: 12px;
+                flex-wrap: wrap;
+            }
+
+            .user-actions {
+                width: 100%;
+                margin-top: 10px;
+                justify-content: flex-end;
+            }
+
+            .btn-chat,
+            .btn-call {
+                padding: 6px 15px;
+                font-size: 12px;
+            }
         }
 
 
@@ -1427,6 +1695,45 @@
                 height: 72vh;
                 border: none;
             }
+
+            .call-container {
+                padding: 25px 20px;
+            }
+
+            .call-avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 36px;
+            }
+
+            .call-name {
+                font-size: 20px;
+            }
+
+            .call-status {
+                font-size: 13px;
+            }
+
+            .call-timer {
+                font-size: 18px;
+            }
+
+            .call-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 22px;
+            }
+
+            .call-controls {
+                gap: 15px;
+            }
+
+            .btn-chat,
+            .btn-call {
+                padding: 5px 12px;
+                font-size: 11px;
+                border-radius: 6px;
+            }
         }
 
         @media (hover: hover) and (pointer: fine) {
@@ -1509,6 +1816,16 @@
             .btn-icon {
                 width: 40px;
                 height: 40px;
+            }
+
+            .call-container {
+                padding: 20px;
+            }
+
+            .call-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 32px;
             }
         }
 
@@ -1661,6 +1978,37 @@
     </div>
 
 
+    <div id="callModal" class="call-modal">
+        <div class="call-container">
+            <div class="call-avatar" id="callAvatar">A</div>
+            <div class="call-name" id="callName">User</div>
+            <div class="call-status" id="callStatus">Calling...</div>
+            <div class="call-timer" id="callTimer" style="display: none;">00:00</div>
+
+            <div class="call-controls" id="activeCallControls" style="display: none;">
+                <button class="call-btn mute" id="muteBtn" onclick="toggleMute()">
+                    🎤
+                </button>
+                <button class="call-btn end" onclick="endCall()">
+                    📞
+                </button>
+            </div>
+
+            <div class="incoming-call-controls" id="incomingCallControls" style="display: none;">
+                <button class="call-btn reject" onclick="rejectCall()">
+                    📞
+                </button>
+                <button class="call-btn accept" onclick="acceptCall()">
+                    📞
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <audio id="remoteAudio" autoplay></audio>
+
+
     <script>
         let ws = null;
         let username = '';
@@ -1669,6 +2017,21 @@
         let onlineUsers = [];
         let currentLanguage = 'ta';
         const textarea = document.getElementById('messageInput');
+
+        let peerConnection = null;
+        let localStream = null;
+        let callTimer = null;
+        let callStartTime = null;
+        let isMuted = false;
+        let currentCallUser = '';
+        let isCallInitiator = false;
+
+        const configuration = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+        };
 
         function connect() {
             username = document.getElementById('usernameInput').value.trim();
@@ -1704,6 +2067,9 @@
                     const t = translations[currentLanguage];
                     addMessage('System', t.disconnected, 'system');
                     document.getElementById('statusText').textContent = t.disconnected;
+                    if (peerConnection) {
+                        endCall();
+                    }
                     location.reload();
                 };
 
@@ -1774,6 +2140,9 @@
                     break;
                 case 'user_left':
                     addMessage('System', `${data.username} ${t.userLeft}`, 'system');
+                    if (data.username === currentCallUser) {
+                        endCall();
+                    }
                     break;
                 case 'user_list':
                     onlineUsers = data.users;
@@ -1797,6 +2166,27 @@
                     break;
                 case 'file':
                     showFileSaveDialog(data.sender, data.fileName, data.fileData, data.fileSize);
+                    break;
+                case 'call_request':
+                    handleIncomingCall(data.from);
+                    break;
+                case 'call_accepted':
+                    handleCallAccepted();
+                    break;
+                case 'call_rejected':
+                    handleCallRejected();
+                    break;
+                case 'call_ended':
+                    handleCallEnded();
+                    break;
+                case 'webrtc_offer':
+                    handleOffer(data.offer, data.from);
+                    break;
+                case 'webrtc_answer':
+                    handleAnswer(data.answer);
+                    break;
+                case 'webrtc_ice_candidate':
+                    handleIceCandidate(data.candidate);
                     break;
             }
         }
@@ -2062,6 +2452,8 @@
             const userListDiv = document.getElementById('userList');
             userListDiv.innerHTML = '';
 
+            const t = translations[currentLanguage];
+
             onlineUsers.forEach(user => {
                 const userItem = document.createElement('div');
                 userItem.className = 'user-item';
@@ -2080,12 +2472,27 @@
                 userInfo.appendChild(userName);
                 userItem.appendChild(userInfo);
 
+
                 if (user !== username) {
+                    const userActions = document.createElement('div');
+                    userActions.className = 'user-actions';
+
+                    const callBtn = document.createElement('button');
+                    callBtn.className = 'btn-call';
+                    callBtn.innerHTML = '📞 ' + (t.callBtn || 'Call');
+                    callBtn.onclick = () => {
+                        initiateCall(user);
+                        closeUserModal();
+                    };
+
                     const chatBtn = document.createElement('button');
                     chatBtn.className = 'btn-chat';
-                    chatBtn.textContent = translations[currentLanguage].chatBtn;
+                    chatBtn.textContent = t.chatBtn;
                     chatBtn.onclick = () => startPrivateChat(user);
-                    userItem.appendChild(chatBtn);
+
+                    userActions.appendChild(callBtn);
+                    userActions.appendChild(chatBtn);
+                    userItem.appendChild(userActions);
                 }
 
                 userListDiv.appendChild(userItem);
@@ -2158,6 +2565,258 @@
             return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
         }
 
+        // WebRTC Functions
+        async function initiateCall(targetUser) {
+            currentCallUser = targetUser;
+            isCallInitiator = true;
+
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                ws.send(JSON.stringify({
+                    type: 'call_request',
+                    to: targetUser,
+                    from: username
+                }));
+
+                showCallModal(targetUser, 'outgoing');
+
+            } catch (error) {
+                alert(translations[currentLanguage].micPermissionDenied || 'Microphone permission denied');
+                console.error('Error accessing microphone:', error);
+            }
+        }
+
+        async function handleIncomingCall(caller) {
+            currentCallUser = caller;
+            isCallInitiator = false;
+            showCallModal(caller, 'incoming');
+        }
+
+        async function acceptCall() {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                ws.send(JSON.stringify({
+                    type: 'call_accepted',
+                    to: currentCallUser,
+                    from: username
+                }));
+
+                await createPeerConnection();
+                showCallModal(currentCallUser, 'active');
+
+            } catch (error) {
+                alert(translations[currentLanguage].micPermissionDenied || 'Microphone permission denied');
+                rejectCall();
+            }
+        }
+
+        function rejectCall() {
+            ws.send(JSON.stringify({
+                type: 'call_rejected',
+                to: currentCallUser,
+                from: username
+            }));
+
+            closeCallModal();
+            currentCallUser = '';
+        }
+
+        async function handleCallAccepted() {
+            await createPeerConnection();
+
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            ws.send(JSON.stringify({
+                type: 'webrtc_offer',
+                offer: offer,
+                to: currentCallUser,
+                from: username
+            }));
+
+            showCallModal(currentCallUser, 'active');
+        }
+
+        function handleCallRejected() {
+            const t = translations[currentLanguage];
+            addMessage('System', `${currentCallUser} ${t.callRejected || 'rejected the call'}`, 'system');
+            closeCallModal();
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            currentCallUser = '';
+        }
+
+        async function createPeerConnection() {
+            peerConnection = new RTCPeerConnection(configuration);
+
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+
+            peerConnection.ontrack = (event) => {
+                const remoteAudio = document.getElementById('remoteAudio');
+                if (remoteAudio) {
+                    remoteAudio.srcObject = event.streams[0];
+                }
+            };
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    ws.send(JSON.stringify({
+                        type: 'webrtc_ice_candidate',
+                        candidate: event.candidate,
+                        to: currentCallUser,
+                        from: username
+                    }));
+                }
+            };
+
+            peerConnection.onconnectionstatechange = () => {
+                if (peerConnection.connectionState === 'connected') {
+                    startCallTimer();
+                }
+                if (peerConnection.connectionState === 'disconnected' ||
+                    peerConnection.connectionState === 'failed') {
+                    endCall();
+                }
+            };
+        }
+
+        async function handleOffer(offer, from) {
+            if (!peerConnection) {
+                await createPeerConnection();
+            }
+
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+
+            ws.send(JSON.stringify({
+                type: 'webrtc_answer',
+                answer: answer,
+                to: from,
+                from: username
+            }));
+        }
+
+        async function handleAnswer(answer) {
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+        }
+
+        async function handleIceCandidate(candidate) {
+            if (peerConnection) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            }
+        }
+
+        function toggleMute() {
+            if (localStream) {
+                const audioTrack = localStream.getAudioTracks()[0];
+                if (audioTrack) {
+                    audioTrack.enabled = !audioTrack.enabled;
+                    isMuted = !audioTrack.enabled;
+
+                    const muteBtn = document.getElementById('muteBtn');
+                    if (isMuted) {
+                        muteBtn.classList.add('active');
+                        muteBtn.textContent = '🔇';
+                    } else {
+                        muteBtn.classList.remove('active');
+                        muteBtn.textContent = '🎤';
+                    }
+                }
+            }
+        }
+
+        function endCall() {
+            ws.send(JSON.stringify({
+                type: 'call_ended',
+                to: currentCallUser,
+                from: username
+            }));
+
+            cleanupCall();
+        }
+
+        function handleCallEnded() {
+            const t = translations[currentLanguage];
+            addMessage('System', `${t.callEnded || 'Call ended'}`, 'system');
+            cleanupCall();
+        }
+
+        function cleanupCall() {
+            if (callTimer) {
+                clearInterval(callTimer);
+                callTimer = null;
+            }
+
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+
+            closeCallModal();
+            currentCallUser = '';
+            isMuted = false;
+            callStartTime = null;
+        }
+
+        function showCallModal(targetUser, state) {
+            const modal = document.getElementById('callModal');
+            const avatar = document.getElementById('callAvatar');
+            const name = document.getElementById('callName');
+            const status = document.getElementById('callStatus');
+            const timer = document.getElementById('callTimer');
+            const activeControls = document.getElementById('activeCallControls');
+            const incomingControls = document.getElementById('incomingCallControls');
+            const t = translations[currentLanguage];
+
+            avatar.textContent = targetUser[0].toUpperCase();
+            name.textContent = targetUser;
+
+            activeControls.style.display = 'none';
+            incomingControls.style.display = 'none';
+            timer.style.display = 'none';
+
+            if (state === 'incoming') {
+                status.textContent = t.incomingCall || 'Incoming call...';
+                incomingControls.style.display = 'flex';
+            } else if (state === 'outgoing') {
+                status.textContent = t.calling || 'Calling...';
+                activeControls.style.display = 'flex';
+            } else if (state === 'active') {
+                status.textContent = t.connected || 'Connected';
+                activeControls.style.display = 'flex';
+                timer.style.display = 'block';
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeCallModal() {
+            document.getElementById('callModal').style.display = 'none';
+        }
+
+        function startCallTimer() {
+            callStartTime = Date.now();
+            callTimer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('callTimer').textContent =
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }, 1000);
+        }
+
         const translations = {
             en: {
                 appTitle: 'Chat Application',
@@ -2201,6 +2860,13 @@
                 disconnected: 'Disconnected',
                 fileSent: '📎 File sent',
                 fileReadError: 'Failed to read file',
+                callBtn: 'Call',
+                calling: 'Calling...',
+                incomingCall: 'Incoming call...',
+                connected: 'Connected',
+                callEnded: 'Call ended',
+                callRejected: 'rejected the call',
+                micPermissionDenied: 'Microphone permission denied',
             },
             ta: {
                 appTitle: 'அரட்டை',
@@ -2244,6 +2910,13 @@
                 disconnected: 'துண்டிக்கப்பட்டது',
                 fileSent: '📎 கோப்பு அனுப்பப்பட்டது',
                 fileReadError: 'கோப்பை படிக்க முடியவில்லை',
+                callBtn: 'அழைப்பு',
+                calling: 'அழைக்கிறது...',
+                incomingCall: 'உள்வரும் அழைப்பு...',
+                connected: 'இணைக்கப்பட்டது',
+                callEnded: 'அழைப்பு முடிந்தது',
+                callRejected: 'அழைப்பை நிராகரித்தார்',
+                micPermissionDenied: 'ஒலிப்பதிவி அனுமதி மறுக்கப்பட்டது',
             }
         };
 
@@ -2410,6 +3083,7 @@
 
 
     </script>
+
 </body>
 
 </html>
