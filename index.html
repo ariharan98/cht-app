@@ -2674,35 +2674,25 @@
                 }
             };
 
-           peerConnection.onicecandidate = (event) => {
-  if (event.candidate) {
-    console.log("LOCAL CAND:", event.candidate.candidate);  
-    ws.send(JSON.stringify({
-      type: 'webrtc_ice_candidate',
-      candidate: event.candidate,
-      to: currentCallUser,
-      from: username
-    }));
-  } else {
-    console.log("ICE gathering complete");
-  }
-};
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    ws.send(JSON.stringify({
+                        type: 'webrtc_ice_candidate',
+                        candidate: event.candidate,
+                        to: currentCallUser,
+                        from: username
+                    }));
+                }
+            };
 
             peerConnection.onconnectionstatechange = () => {
-                console.log('ICE:', peerConnection.iceConnectionState);
-
-    if (peerConnection.iceConnectionState === 'connected' ||
-        peerConnection.iceConnectionState === 'completed') {
-
-        showCallModal(currentCallUser, 'active');
-        startCallTimer();
-    }
-
-    if (peerConnection.iceConnectionState === 'failed' ||
-        peerConnection.iceConnectionState === 'disconnected') {
-
-        endCall();
-    }
+                if (peerConnection.connectionState === 'connected') {
+                    startCallTimer();
+                }
+                if (peerConnection.connectionState === 'disconnected' ||
+                    peerConnection.connectionState === 'failed') {
+                    endCall();
+                }
             };
         }
 
@@ -3117,5 +3107,6 @@
 </body>
 
 </html>
+
 
 
