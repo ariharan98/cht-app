@@ -2027,20 +2027,20 @@
         let isCallInitiator = false;
 
         const configuration = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-
-                {
-                    urls: 'turn:global.relay.metered.ca:80',
-                    username: 'open',
-                    credential: 'open'
-                },
-                {
-                    urls: 'turn:global.relay.metered.ca:443',
-                    username: 'open',
-                    credential: 'open'
-                }
-            ]
+            iceTransportPolicy: "relay",
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    {
+      urls: "turn:global.relay.metered.ca:80",
+      username: "open",
+      credential: "open"
+    },
+    {
+      urls: "turn:global.relay.metered.ca:443?transport=tcp",
+      username: "open",
+      credential: "open"
+    }
+  ]
         };
 
         function connect() {
@@ -2674,16 +2674,19 @@
                 }
             };
 
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    ws.send(JSON.stringify({
-                        type: 'webrtc_ice_candidate',
-                        candidate: event.candidate,
-                        to: currentCallUser,
-                        from: username
-                    }));
-                }
-            };
+           peerConnection.onicecandidate = (event) => {
+  if (event.candidate) {
+    console.log("LOCAL CAND:", event.candidate.candidate);  
+    ws.send(JSON.stringify({
+      type: 'webrtc_ice_candidate',
+      candidate: event.candidate,
+      to: currentCallUser,
+      from: username
+    }));
+  } else {
+    console.log("ICE gathering complete");
+  }
+};
 
             peerConnection.onconnectionstatechange = () => {
                 console.log('ICE:', peerConnection.iceConnectionState);
@@ -3114,4 +3117,5 @@
 </body>
 
 </html>
+
 
