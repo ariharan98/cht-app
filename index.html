@@ -2029,7 +2029,17 @@
         const configuration = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
+
+                {
+                    urls: 'turn:global.relay.metered.ca:80',
+                    username: 'open',
+                    credential: 'open'
+                },
+                {
+                    urls: 'turn:global.relay.metered.ca:443',
+                    username: 'open',
+                    credential: 'open'
+                }
             ]
         };
 
@@ -2687,6 +2697,11 @@
         }
 
         async function handleOffer(offer, from) {
+
+            if (!localStream) {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
+
             if (!peerConnection) {
                 await createPeerConnection();
             }
@@ -2708,8 +2723,13 @@
         }
 
         async function handleIceCandidate(candidate) {
-            if (peerConnection) {
+            if (!peerConnection) {
+                await createPeerConnection();
+            }
+            try {
                 await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            } catch (e) {
+                console.error('ICE add failed', e);
             }
         }
 
