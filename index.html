@@ -2027,7 +2027,7 @@
         let isCallInitiator = false;
 
         const configuration = {
-            iceServers: [
+            /*iceServers: [
                 {
                     urls: "stun:stun.relay.metered.ca:80",
                 },
@@ -2051,6 +2051,10 @@
                     username: "d58d00e2ee1c7d2e7f305c35",
                     credential: "VfTFfknNTJLrZOM6",
                 },
+            ]*/
+             iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' }
             ]
         };
 
@@ -3118,6 +3122,7 @@
 </body>
 
 </html>
+
 
 
 
