@@ -2686,13 +2686,20 @@
             };
 
             peerConnection.onconnectionstatechange = () => {
-                if (peerConnection.connectionState === 'connected') {
-                    startCallTimer();
-                }
-                if (peerConnection.connectionState === 'disconnected' ||
-                    peerConnection.connectionState === 'failed') {
-                    endCall();
-                }
+                console.log('ICE:', peerConnection.iceConnectionState);
+
+    if (peerConnection.iceConnectionState === 'connected' ||
+        peerConnection.iceConnectionState === 'completed') {
+
+        showCallModal(currentCallUser, 'active');
+        startCallTimer();
+    }
+
+    if (peerConnection.iceConnectionState === 'failed' ||
+        peerConnection.iceConnectionState === 'disconnected') {
+
+        endCall();
+    }
             };
         }
 
@@ -3107,3 +3114,4 @@
 </body>
 
 </html>
+
