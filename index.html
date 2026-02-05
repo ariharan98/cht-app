@@ -2027,20 +2027,31 @@
         let isCallInitiator = false;
 
         const configuration = {
-            iceTransportPolicy: "relay",
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    {
-      urls: "turn:global.relay.metered.ca:80",
-      username: "open",
-      credential: "open"
-    },
-    {
-      urls: "turn:global.relay.metered.ca:443?transport=tcp",
-      username: "open",
-      credential: "open"
-    }
-  ]
+            iceServers: [
+                {
+                    urls: "stun:stun.relay.metered.ca:80",
+                },
+                {
+                    urls: "turn:global.relay.metered.ca:80",
+                    username: "d58d00e2ee1c7d2e7f305c35",
+                    credential: "VfTFfknNTJLrZOM6",
+                },
+                {
+                    urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                    username: "d58d00e2ee1c7d2e7f305c35",
+                    credential: "VfTFfknNTJLrZOM6",
+                },
+                {
+                    urls: "turn:global.relay.metered.ca:443",
+                    username: "d58d00e2ee1c7d2e7f305c35",
+                    credential: "VfTFfknNTJLrZOM6",
+                },
+                {
+                    urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                    username: "d58d00e2ee1c7d2e7f305c35",
+                    credential: "VfTFfknNTJLrZOM6",
+                },
+            ]
         };
 
         function connect() {
@@ -3107,6 +3118,7 @@
 </body>
 
 </html>
+
 
 
 
