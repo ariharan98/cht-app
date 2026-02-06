@@ -883,6 +883,12 @@
             box-shadow: 0 5px 25px rgba(220, 38, 38, 0.5);
         }
 
+        .btn-call:disabled {
+            background: rgba(100, 116, 139, 0.15);
+            border-color: rgba(100, 116, 139, 0.3);
+            color: #94a3b8;
+        }
+
         .incoming-call-controls {
             display: flex;
             gap: 20px;
@@ -2027,32 +2033,7 @@
         let isCallInitiator = false;
 
         const configuration = {
-            /*iceServers: [
-                {
-                    urls: "stun:stun.relay.metered.ca:80",
-                },
-                {
-                    urls: "turn:global.relay.metered.ca:80",
-                    username: "d58d00e2ee1c7d2e7f305c35",
-                    credential: "VfTFfknNTJLrZOM6",
-                },
-                {
-                    urls: "turn:global.relay.metered.ca:80?transport=tcp",
-                    username: "d58d00e2ee1c7d2e7f305c35",
-                    credential: "VfTFfknNTJLrZOM6",
-                },
-                {
-                    urls: "turn:global.relay.metered.ca:443",
-                    username: "d58d00e2ee1c7d2e7f305c35",
-                    credential: "VfTFfknNTJLrZOM6",
-                },
-                {
-                    urls: "turns:global.relay.metered.ca:443?transport=tcp",
-                    username: "d58d00e2ee1c7d2e7f305c35",
-                    credential: "VfTFfknNTJLrZOM6",
-                },
-            ]*/
-             iceServers: [
+            iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' }
             ]
@@ -2149,6 +2130,7 @@
                     document.getElementById('chatScreen').style.display = 'flex';
                     document.getElementById('statusText').textContent = username + ' • ' + t.groupChat;
                     addMessage('System', t.connectedSuccess, 'system');
+                    requestNotificationPermission();
                     break;
                 case 'auth_error':
                     alert(data.message);
@@ -2215,6 +2197,15 @@
                     break;
             }
         }
+
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) return;
+
+            if (Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
 
         function showFileSaveDialog(sender, fileName, fileData, fileSize) {
             const modal = document.getElementById('fileModal');
@@ -2488,32 +2479,40 @@
 
                 const avatar = document.createElement('div');
                 avatar.className = 'user-avatar';
-                avatar.textContent = user[0].toUpperCase();
+                avatar.textContent = user.name[0].toUpperCase();
 
                 const userName = document.createElement('span');
-                userName.textContent = user;
+                userName.textContent = user.name;
 
                 userInfo.appendChild(avatar);
                 userInfo.appendChild(userName);
                 userItem.appendChild(userInfo);
 
 
-                if (user !== username) {
+                if (user.name !== username) {
                     const userActions = document.createElement('div');
                     userActions.className = 'user-actions';
 
                     const callBtn = document.createElement('button');
                     callBtn.className = 'btn-call';
-                    callBtn.innerHTML = '📞 ' + (t.callBtn || 'Call');
-                    callBtn.onclick = () => {
-                        initiateCall(user);
-                        closeUserModal();
-                    };
+
+                    if (user.callState !== 'idle') {
+                        callBtn.textContent = t.inCall || 'Busy';
+                        callBtn.disabled = true;
+                        callBtn.style.opacity = '0.6';
+                        callBtn.style.cursor = 'not-allowed';
+                    } else {
+                        callBtn.innerHTML = '📞 ' + (t.callBtn || 'Call');
+                        callBtn.onclick = () => {
+                            initiateCall(user.name);
+                            closeUserModal();
+                        };
+                    }
 
                     const chatBtn = document.createElement('button');
                     chatBtn.className = 'btn-chat';
                     chatBtn.textContent = t.chatBtn;
-                    chatBtn.onclick = () => startPrivateChat(user);
+                    chatBtn.onclick = () => startPrivateChat(user.name);
 
                     userActions.appendChild(callBtn);
                     userActions.appendChild(chatBtn);
@@ -2592,11 +2591,12 @@
 
         // WebRTC Functions
         async function initiateCall(targetUser) {
-            currentCallUser = targetUser;
-            isCallInitiator = true;
 
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                currentCallUser = targetUser;
+                isCallInitiator = true;
 
                 ws.send(JSON.stringify({
                     type: 'call_request',
@@ -2613,9 +2613,26 @@
         }
 
         async function handleIncomingCall(caller) {
+
+            if (currentCallUser) {
+                ws.send(JSON.stringify({
+                    type: 'call_rejected',
+                    to: caller,
+                    from: username
+                }));
+                return;
+            }
+
             currentCallUser = caller;
             isCallInitiator = false;
             showCallModal(caller, 'incoming');
+            if (Notification.permission === 'granted') {
+                new Notification('Incoming Call 📞', {
+                    body: `${caller} is calling you`,
+                    icon: '📞',
+                    requireInteraction: true
+                });
+            }
         }
 
         async function acceptCall() {
@@ -2738,13 +2755,8 @@
         }
 
         async function handleIceCandidate(candidate) {
-            if (!peerConnection) {
-                await createPeerConnection();
-            }
-            try {
+            if (peerConnection) {
                 await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-            } catch (e) {
-                console.error('ICE add failed', e);
             }
         }
 
@@ -2778,12 +2790,14 @@
         }
 
         function handleCallEnded() {
+            if (!currentCallUser) return;
             const t = translations[currentLanguage];
             addMessage('System', `${t.callEnded || 'Call ended'}`, 'system');
             cleanupCall();
         }
 
         function cleanupCall() {
+
             if (callTimer) {
                 clearInterval(callTimer);
                 callTimer = null;
@@ -2902,6 +2916,7 @@
                 callEnded: 'Call ended',
                 callRejected: 'rejected the call',
                 micPermissionDenied: 'Microphone permission denied',
+                inCall: 'In Call'
             },
             ta: {
                 appTitle: 'அரட்டை',
@@ -2952,6 +2967,7 @@
                 callEnded: 'அழைப்பு முடிந்தது',
                 callRejected: 'அழைப்பை நிராகரித்தார்',
                 micPermissionDenied: 'ஒலிப்பதிவி அனுமதி மறுக்கப்பட்டது',
+                inCall: 'அழைப்பில்'
             }
         };
 
@@ -3122,8 +3138,3 @@
 </body>
 
 </html>
-
-
-
-
-
