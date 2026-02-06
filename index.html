@@ -2635,12 +2635,14 @@
                 return;
             }
 
+            const t = translations[currentLanguage];
+
             currentCallUser = caller;
             isCallInitiator = false;
             showCallModal(caller, 'incoming');
             if (Notification.permission === 'granted') {
-                new Notification('Incoming Call 📞', {
-                    body: `${caller} is calling you`,
+                new Notification(`${t.incomingCall} 📞`, {
+                    body: `${caller}${t.isCalligYou}`,
                     icon: '📞',
                     requireInteraction: true
                 });
@@ -2923,7 +2925,8 @@
                 fileReadError: 'Failed to read file',
                 callBtn: 'Call',
                 calling: 'Calling...',
-                incomingCall: 'Incoming call...',
+                incomingCall: 'Incoming call... ',
+                isCalligYou : ' is calling you',
                 connected: 'Connected',
                 callEnded: 'Call ended',
                 callRejected: 'rejected the call',
@@ -2936,7 +2939,6 @@
                 acceptCall: 'Accept',
                 rejectCall: 'Reject',
                 calling: 'Calling...',
-                incomingCall: 'Incoming call',
                 connected: 'Connected',
                 callEnded: 'Call ended'
             },
@@ -2984,7 +2986,8 @@
                 fileReadError: 'கோப்பை படிக்க முடியவில்லை',
                 callBtn: 'அழைப்பு',
                 calling: 'அழைக்கிறது...',
-                incomingCall: 'உள்வரும் அழைப்பு...',
+                incomingCall: 'உள்வரும் அழைப்பு... ',
+                isCalligYou : ' உங்களை அழைக்கிறார்கள்',
                 connected: 'இணைக்கப்பட்டது',
                 callEnded: 'அழைப்பு முடிந்தது',
                 callRejected: 'அழைப்பை நிராகரித்தார்',
@@ -2997,7 +3000,6 @@
                 acceptCall: 'ஏற்கவும்',
                 rejectCall: 'நிராகரி',
                 calling: 'அழைக்கிறது...',
-                incomingCall: 'உள்வரும் அழைப்பு',
                 connected: 'இணைக்கப்பட்டது',
                 callEnded: 'அழைப்பு முடிந்தது'
             }
