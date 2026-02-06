@@ -2035,6 +2035,135 @@
         let isMuted = false;
         let currentCallUser = '';
         let isCallInitiator = false;
+        let myCountryCode = null;
+
+        const translations = {
+            en: {
+                appTitle: 'Chat Application',
+                appSubtitle: 'Hey… lets talk😊',
+                usernameLabel: 'Username',
+                usernamePlaceholder: 'Enter your username',
+                infoText: '💡 Info: This is a private chat. Refreshing the page will start a new conversation.',
+                langToggle: 'தமிழ்',
+                chatTitle: 'Chat Application',
+                connecting: 'Connecting...',
+                usersBtn: 'Users',
+                groupBtn: 'Group',
+                themeBtn: 'Theme',
+                modalTitle: 'Online Users',
+                groupChat: 'Group Chat',
+                privateChat: 'Private with',
+                connectedSuccess: 'Connected successfully!',
+                userJoined: 'joined the chat',
+                userLeft: 'left the chat',
+                switchedToGroup: 'Switched to group chat',
+                enterNameAlert: 'Please enter your name',
+                unknownCommand: 'Unknown command',
+                notConnected: 'Not connected to server',
+                file: '📎 File',
+                fileSaved: ' - saved successfully',
+                fileNotSaved: ' - was not saved',
+                largeFileSending: 'Large file is being sent : ',
+                pleaseWait: ' Please wait...',
+                incomingFile: 'Incoming File',
+                receivedFile: 'Received file',
+                fileSize: 'Size',
+                sender: 'Sender',
+                saveFileConfirm: 'Do you want to save this file?',
+                yes: 'Yes',
+                no: 'No',
+                connectBtn: 'Connect',
+                typeMessage: 'Type a message...',
+                chatBtn: 'Chat',
+                incomingFileTitle: 'Incoming File',
+                connectionError: 'Connection error occurred',
+                disconnected: 'Disconnected',
+                fileSent: '📎 File sent',
+                fileReadError: 'Failed to read file',
+                callBtn: 'Call',
+                calling: 'Calling...',
+                incomingCall: 'Incoming call... ',
+                isCalligYou: ' is calling you',
+                connected: 'Connected',
+                callEnded: 'Call ended',
+                callRejected: 'rejected the call',
+                micPermissionDenied: 'Microphone permission denied',
+                inCall: 'In Call',
+                mute: 'Mute',
+                unmute: 'Unmute',
+                speaker: 'Speaker',
+                endCall: 'End Call',
+                acceptCall: 'Accept',
+                rejectCall: 'Reject',
+                calling: 'Calling...',
+                connected: 'Connected',
+                callEnded: 'Call ended',
+                countryBlocked: '📵 Call blocked: users are in different countries'
+            },
+            ta: {
+                appTitle: 'அரட்டை',
+                appSubtitle: 'வாங்க… பேசலாம்😊',
+                usernameLabel: 'உங்கள் பெயர்',
+                usernamePlaceholder: 'பயனர் பெயரை உள்ளிடுங்கள்',
+                infoText: '💡 தகவல்: இது ஒரு தனிப்பட்ட உரையாடல். பக்கத்தை புதுப்பித்தால் புதிய உரையாடல் தொடங்கும்.',
+                langToggle: 'English',
+                chatTitle: 'அரட்டை',
+                connecting: 'இணைக்கப்படுகிறது...',
+                usersBtn: 'உறுப்பினர்கள்',
+                groupBtn: 'குழுமம்',
+                themeBtn: 'தோற்றம்',
+                modalTitle: 'தற்போது இணைந்துள்ள பயனர்கள்',
+                groupChat: 'குழு உரையாடல்',
+                privateChat: 'உடன் தனிப்பட்ட உரையாடல்',
+                connectedSuccess: 'வெற்றிகரமாக இணைக்கப்பட்டது!',
+                userJoined: 'அரட்டையில் சேர்ந்தார்',
+                userLeft: 'அரட்டையிலிருந்து வெளியேறினார்',
+                switchedToGroup: 'குழு உரையாடலுக்கு மாற்றப்பட்டது',
+                enterNameAlert: 'தயவுசெய்து உங்கள் பெயரை உள்ளிடுங்கள்',
+                unknownCommand: 'அறியப்படாத கட்டளை',
+                notConnected: 'சர்வருடன் இணைக்கப்படவில்லை',
+                file: '📎 கோப்பு',
+                fileSaved: ' - வெற்றிகரமாக சேமிக்கப்பட்டது',
+                fileNotSaved: ' - சேமிக்கப்படவில்லை',
+                largeFileSending: 'பெரிய கோப்பு அனுப்பப்படுகிறது : ',
+                pleaseWait: ' தயவுசெய்து காத்திருக்கவும்...',
+                incomingFile: 'பெறப்பட்ட கோப்பு',
+                receivedFile: 'கோப்பு பெறப்பட்டது',
+                fileSize: 'அளவு',
+                sender: 'அனுப்பியவர்',
+                saveFileConfirm: 'கோப்பை சேமிக்க வேண்டுமா?',
+                yes: 'ஆம்',
+                no: 'இல்லை',
+                connectBtn: 'இணைக்கவும்',
+                typeMessage: 'செய்தியை உள்ளிடுங்கள்...',
+                chatBtn: 'அரட்டை',
+                incomingFileTitle: 'பெறப்பட்ட கோப்பு',
+                connectionError: 'இணைப்பு பிழை ஏற்பட்டது',
+                disconnected: 'துண்டிக்கப்பட்டது',
+                fileSent: '📎 கோப்பு அனுப்பப்பட்டது',
+                fileReadError: 'கோப்பை படிக்க முடியவில்லை',
+                callBtn: 'அழைப்பு',
+                calling: 'அழைக்கிறது...',
+                incomingCall: 'உள்வரும் அழைப்பு... ',
+                isCalligYou: ' உங்களை அழைக்கிறார்கள்',
+                connected: 'இணைக்கப்பட்டது',
+                callEnded: 'அழைப்பு முடிந்தது',
+                callRejected: 'அழைப்பை நிராகரித்தார்',
+                micPermissionDenied: 'ஒலிப்பதிவி அனுமதி மறுக்கப்பட்டது',
+                inCall: 'அழைப்பில்',
+                mute: 'ஒலி நிறுத்து',
+                unmute: 'ஒலி இயக்கு',
+                speaker: 'ஸ்பீக்கர்',
+                endCall: 'அழைப்பை முடி',
+                acceptCall: 'ஏற்கவும்',
+                rejectCall: 'நிராகரி',
+                calling: 'அழைக்கிறது...',
+                connected: 'இணைக்கப்பட்டது',
+                callEnded: 'அழைப்பு முடிந்தது',
+                countryBlocked: '📵 நாடு வேறுபாடு காரணமாக அழைப்பு தடுக்கப்பட்டது'
+                
+            }
+        };
 
         const configuration = {
             iceServers: [
@@ -2042,6 +2171,7 @@
                 { urls: 'stun:stun1.l.google.com:19302' }
             ]
         };
+
 
         function connect() {
             username = document.getElementById('usernameInput').value.trim();
@@ -2109,6 +2239,7 @@
         });
 
 
+
         textarea.addEventListener('input', function () {
             textarea.style.height = 'auto';
 
@@ -2122,6 +2253,19 @@
                 textarea.style.overflowY = 'hidden';
             }
         });
+
+        async function detectMyCountry() {
+            try {
+                const res = await fetch('https://ipwho.is/');
+                const data = await res.json();
+
+                if (data.success) {
+                    myCountryCode = data.country_code;
+                }
+            } catch (e) {
+                alert('Country detection failed');
+            }
+        }
 
 
 
@@ -2179,13 +2323,13 @@
                     showFileSaveDialog(data.sender, data.fileName, data.fileData, data.fileSize);
                     break;
                 case 'call_request':
-                    handleIncomingCall(data.from);
+                    handleIncomingCall(data.from, data.country);
                     break;
                 case 'call_accepted':
                     handleCallAccepted();
                     break;
                 case 'call_rejected':
-                    handleCallRejected();
+                    handleCallRejected(data.reason);
                     break;
                 case 'call_ended':
                     handleCallEnded();
@@ -2613,7 +2757,8 @@
                 ws.send(JSON.stringify({
                     type: 'call_request',
                     to: targetUser,
-                    from: username
+                    from: username,
+                    country: myCountryCode
                 }));
 
                 showCallModal(targetUser, 'outgoing');
@@ -2624,13 +2769,23 @@
             }
         }
 
-        async function handleIncomingCall(caller) {
+        async function handleIncomingCall(caller, callerCountry) {
 
             if (currentCallUser) {
                 ws.send(JSON.stringify({
                     type: 'call_rejected',
                     to: caller,
                     from: username
+                }));
+                return;
+            }
+
+            if (myCountryCode && callerCountry && myCountryCode !== callerCountry) {
+                ws.send(JSON.stringify({
+                    type: 'call_rejected',
+                    to: caller,
+                    from: username,
+                    reason: 'DIFFERENT_COUNTRY'
                 }));
                 return;
             }
@@ -2695,9 +2850,15 @@
             showCallModal(currentCallUser, 'active');
         }
 
-        function handleCallRejected() {
+        function handleCallRejected(reason) {
             const t = translations[currentLanguage];
-            addMessage('System', `${currentCallUser} ${t.callRejected || 'rejected the call'}`, 'system');
+            let message = `${currentCallUser} ${t.callRejected || 'rejected the call'}`;
+
+            if (reason === 'DIFFERENT_COUNTRY') {
+                message =  translations[currentLanguage].countryBlocked;
+            }
+
+            addMessage('System', message, 'system');
             closeCallModal();
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
@@ -2880,131 +3041,6 @@
             }, 1000);
         }
 
-        const translations = {
-            en: {
-                appTitle: 'Chat Application',
-                appSubtitle: 'Hey… lets talk😊',
-                usernameLabel: 'Username',
-                usernamePlaceholder: 'Enter your username',
-                infoText: '💡 Info: This is a private chat. Refreshing the page will start a new conversation.',
-                langToggle: 'தமிழ்',
-                chatTitle: 'Chat Application',
-                connecting: 'Connecting...',
-                usersBtn: 'Users',
-                groupBtn: 'Group',
-                themeBtn: 'Theme',
-                modalTitle: 'Online Users',
-                groupChat: 'Group Chat',
-                privateChat: 'Private with',
-                connectedSuccess: 'Connected successfully!',
-                userJoined: 'joined the chat',
-                userLeft: 'left the chat',
-                switchedToGroup: 'Switched to group chat',
-                enterNameAlert: 'Please enter your name',
-                unknownCommand: 'Unknown command',
-                notConnected: 'Not connected to server',
-                file: '📎 File',
-                fileSaved: ' - saved successfully',
-                fileNotSaved: ' - was not saved',
-                largeFileSending: 'Large file is being sent : ',
-                pleaseWait: ' Please wait...',
-                incomingFile: 'Incoming File',
-                receivedFile: 'Received file',
-                fileSize: 'Size',
-                sender: 'Sender',
-                saveFileConfirm: 'Do you want to save this file?',
-                yes: 'Yes',
-                no: 'No',
-                connectBtn: 'Connect',
-                typeMessage: 'Type a message...',
-                chatBtn: 'Chat',
-                incomingFileTitle: 'Incoming File',
-                connectionError: 'Connection error occurred',
-                disconnected: 'Disconnected',
-                fileSent: '📎 File sent',
-                fileReadError: 'Failed to read file',
-                callBtn: 'Call',
-                calling: 'Calling...',
-                incomingCall: 'Incoming call... ',
-                isCalligYou : ' is calling you',
-                connected: 'Connected',
-                callEnded: 'Call ended',
-                callRejected: 'rejected the call',
-                micPermissionDenied: 'Microphone permission denied',
-                inCall: 'In Call',
-                mute: 'Mute',
-                unmute: 'Unmute',
-                speaker: 'Speaker',
-                endCall: 'End Call',
-                acceptCall: 'Accept',
-                rejectCall: 'Reject',
-                calling: 'Calling...',
-                connected: 'Connected',
-                callEnded: 'Call ended'
-            },
-            ta: {
-                appTitle: 'அரட்டை',
-                appSubtitle: 'வாங்க… பேசலாம்😊',
-                usernameLabel: 'உங்கள் பெயர்',
-                usernamePlaceholder: 'பயனர் பெயரை உள்ளிடுங்கள்',
-                infoText: '💡 தகவல்: இது ஒரு தனிப்பட்ட உரையாடல். பக்கத்தை புதுப்பித்தால் புதிய உரையாடல் தொடங்கும்.',
-                langToggle: 'English',
-                chatTitle: 'அரட்டை',
-                connecting: 'இணைக்கப்படுகிறது...',
-                usersBtn: 'உறுப்பினர்கள்',
-                groupBtn: 'குழுமம்',
-                themeBtn: 'தோற்றம்',
-                modalTitle: 'தற்போது இணைந்துள்ள பயனர்கள்',
-                groupChat: 'குழு உரையாடல்',
-                privateChat: 'உடன் தனிப்பட்ட உரையாடல்',
-                connectedSuccess: 'வெற்றிகரமாக இணைக்கப்பட்டது!',
-                userJoined: 'அரட்டையில் சேர்ந்தார்',
-                userLeft: 'அரட்டையிலிருந்து வெளியேறினார்',
-                switchedToGroup: 'குழு உரையாடலுக்கு மாற்றப்பட்டது',
-                enterNameAlert: 'தயவுசெய்து உங்கள் பெயரை உள்ளிடுங்கள்',
-                unknownCommand: 'அறியப்படாத கட்டளை',
-                notConnected: 'சர்வருடன் இணைக்கப்படவில்லை',
-                file: '📎 கோப்பு',
-                fileSaved: ' - வெற்றிகரமாக சேமிக்கப்பட்டது',
-                fileNotSaved: ' - சேமிக்கப்படவில்லை',
-                largeFileSending: 'பெரிய கோப்பு அனுப்பப்படுகிறது : ',
-                pleaseWait: ' தயவுசெய்து காத்திருக்கவும்...',
-                incomingFile: 'பெறப்பட்ட கோப்பு',
-                receivedFile: 'கோப்பு பெறப்பட்டது',
-                fileSize: 'அளவு',
-                sender: 'அனுப்பியவர்',
-                saveFileConfirm: 'கோப்பை சேமிக்க வேண்டுமா?',
-                yes: 'ஆம்',
-                no: 'இல்லை',
-                connectBtn: 'இணைக்கவும்',
-                typeMessage: 'செய்தியை உள்ளிடுங்கள்...',
-                chatBtn: 'அரட்டை',
-                incomingFileTitle: 'பெறப்பட்ட கோப்பு',
-                connectionError: 'இணைப்பு பிழை ஏற்பட்டது',
-                disconnected: 'துண்டிக்கப்பட்டது',
-                fileSent: '📎 கோப்பு அனுப்பப்பட்டது',
-                fileReadError: 'கோப்பை படிக்க முடியவில்லை',
-                callBtn: 'அழைப்பு',
-                calling: 'அழைக்கிறது...',
-                incomingCall: 'உள்வரும் அழைப்பு... ',
-                isCalligYou : ' உங்களை அழைக்கிறார்கள்',
-                connected: 'இணைக்கப்பட்டது',
-                callEnded: 'அழைப்பு முடிந்தது',
-                callRejected: 'அழைப்பை நிராகரித்தார்',
-                micPermissionDenied: 'ஒலிப்பதிவி அனுமதி மறுக்கப்பட்டது',
-                inCall: 'அழைப்பில்',
-                mute: 'ஒலி நிறுத்து',
-                unmute: 'ஒலி இயக்கு',
-                speaker: 'ஸ்பீக்கர்',
-                endCall: 'அழைப்பை முடி',
-                acceptCall: 'ஏற்கவும்',
-                rejectCall: 'நிராகரி',
-                calling: 'அழைக்கிறது...',
-                connected: 'இணைக்கப்பட்டது',
-                callEnded: 'அழைப்பு முடிந்தது'
-            }
-        };
-
         function updateUILanguage() {
 
             const t = translations[currentLanguage];
@@ -3057,6 +3093,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('tamil');
+            detectMyCountry();
             updateUILanguage();
             document.getElementById('usernameInput').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') connect();
