@@ -1995,6 +1995,9 @@
                 <button class="call-btn mute" id="muteBtn" onclick="toggleMute()">
                     🎤
                 </button>
+                <button class="call-btn mute" id="speakerBtn" onclick="toggleSpeaker()">
+                    🔊
+                </button>
                 <button class="call-btn end" onclick="endCall()">
                     📞
                 </button>
@@ -2018,6 +2021,7 @@
     <script>
         let ws = null;
         let username = '';
+        let isSpeakerOn = true;
         let currentMode = 'group';
         let privateReceiver = '';
         let onlineUsers = [];
@@ -2194,6 +2198,14 @@
                     break;
                 case 'webrtc_ice_candidate':
                     handleIceCandidate(data.candidate);
+                    break;
+                case 'call_timeout':
+                    if (!currentCallUser) break;
+                    addMessage('System',
+                        translations[currentLanguage].callEnded || 'Call timed out',
+                        'system'
+                    );
+                    cleanupCall();
                     break;
             }
         }
@@ -2916,7 +2928,17 @@
                 callEnded: 'Call ended',
                 callRejected: 'rejected the call',
                 micPermissionDenied: 'Microphone permission denied',
-                inCall: 'In Call'
+                inCall: 'In Call',
+                mute: 'Mute',
+                unmute: 'Unmute',
+                speaker: 'Speaker',
+                endCall: 'End Call',
+                acceptCall: 'Accept',
+                rejectCall: 'Reject',
+                calling: 'Calling...',
+                incomingCall: 'Incoming call',
+                connected: 'Connected',
+                callEnded: 'Call ended'
             },
             ta: {
                 appTitle: 'அரட்டை',
@@ -2967,7 +2989,17 @@
                 callEnded: 'அழைப்பு முடிந்தது',
                 callRejected: 'அழைப்பை நிராகரித்தார்',
                 micPermissionDenied: 'ஒலிப்பதிவி அனுமதி மறுக்கப்பட்டது',
-                inCall: 'அழைப்பில்'
+                inCall: 'அழைப்பில்',
+                mute: 'ஒலி நிறுத்து',
+                unmute: 'ஒலி இயக்கு',
+                speaker: 'ஸ்பீக்கர்',
+                endCall: 'அழைப்பை முடி',
+                acceptCall: 'ஏற்கவும்',
+                rejectCall: 'நிராகரி',
+                calling: 'அழைக்கிறது...',
+                incomingCall: 'உள்வரும் அழைப்பு',
+                connected: 'இணைக்கப்பட்டது',
+                callEnded: 'அழைப்பு முடிந்தது'
             }
         };
 
@@ -3130,6 +3162,41 @@
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;");
+        }
+
+        async function toggleSpeaker() {
+            const audio = document.getElementById('remoteAudio');
+            const btn = document.getElementById('speakerBtn');
+
+
+            if (!audio || typeof audio.setSinkId !== 'function') {
+                alert('Speaker / phone switching is not supported in this browser.');
+                return;
+            }
+
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const outputs = devices.filter(d => d.kind === 'audiooutput');
+
+            if (!outputs.length) {
+                alert('No audio output devices found');
+                return;
+            }
+
+            const speaker = outputs.find(d =>
+                d.label.toLowerCase().includes('speaker')
+            );
+
+            const defaultDevice = outputs.find(d => d.deviceId === 'default') || outputs[0];
+
+            isSpeakerOn = !isSpeakerOn;
+
+            await audio.setSinkId(
+                isSpeakerOn
+                    ? (speaker?.deviceId || defaultDevice.deviceId)
+                    : defaultDevice.deviceId
+            );
+
+            btn.textContent = isSpeakerOn ? '🔊' : '📞';
         }
 
 
