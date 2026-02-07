@@ -960,6 +960,30 @@
             }
         }
 
+        #infoModal .modal-content {
+            max-width: 550px;
+            width: 92%;
+        }
+
+        #infoModalContent {
+            padding: 20px 25px;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #e0e0e0;
+        }
+
+        #infoModalContent b {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .info-modal-footer {
+            padding: 15px 25px;
+            text-align: right;
+            border-top: 2px solid rgba(224, 0, 0, 0.2);
+        }
+
+
 
         body.light-theme {
             background: #f5f7fa;
@@ -1299,6 +1323,39 @@
             background: rgba(59, 130, 246, 0.2);
         }
 
+        body.light-theme #infoModalContent {
+            color: #475569;
+        }
+
+        body.light-theme #infoModalContent b {
+            color: #1a1a1a;
+        }
+
+        body.light-theme .info-modal-footer {
+            border-top: 2px solid rgba(100, 116, 139, 0.15);
+        }
+
+        #infoModalContent::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #infoModalContent::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #infoModalContent::-webkit-scrollbar-thumb {
+            background: rgba(224, 0, 0, 0.4);
+            border-radius: 10px;
+        }
+
+        body.light-theme #infoModalContent::-webkit-scrollbar-track {
+            background: rgba(100, 116, 139, 0.05);
+        }
+
+        body.light-theme #infoModalContent::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.3);
+        }
+
         .language-toggle {
             top: 15px;
             right: 15px;
@@ -1566,6 +1623,28 @@
                 bottom: 90px;
                 right: 12px;
             }
+
+            #infoModal .modal-content {
+                width: 95%;
+                max-height: 85vh;
+            }
+
+            #infoModalContent {
+                padding: 18px 20px;
+                font-size: 13px;
+                line-height: 1.65;
+                max-height: calc(85vh - 140px);
+                overflow-y: auto;
+            }
+
+            .info-modal-footer {
+                padding: 12px 20px;
+            }
+
+            .info-modal-footer .btn-dialog {
+                width: 100%;
+                padding: 14px 20px;
+            }
         }
 
 
@@ -1803,6 +1882,28 @@
                 bottom: 85px;
                 right: 10px;
                 border-radius: 8px;
+            }
+
+            #infoModal .modal-content {
+                width: 96%;
+                max-height: 88vh;
+                margin: 10px;
+            }
+
+            #infoModalContent {
+                padding: 16px 18px;
+                font-size: 12.5px;
+                line-height: 1.6;
+                max-height: calc(88vh - 130px);
+            }
+
+            .info-modal-footer {
+                padding: 10px 18px;
+            }
+
+            .info-modal-footer .btn-dialog {
+                padding: 12px 18px;
+                font-size: 13px;
             }
         }
 
@@ -2085,6 +2186,23 @@
         </div>
     </div>
 
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>ℹ️ தகவல்</h3>
+                <button class="btn-close" onclick="closeInfoModal()">×</button>
+            </div>
+            <div style="padding:20px;font-size:14px;line-height:1.6;" id="infoModalContent"></div>
+
+            <div class="info-modal-footer">
+                <button class="btn-dialog primary" onclick="closeInfoModal()">
+                    👍 புரிந்தது
+                </button>
+            </div>
+        </div>
+    </div>
+
+
 
     <audio id="remoteAudio" autoplay></audio>
 
@@ -2175,7 +2293,9 @@
                 calling: 'Calling...',
                 connected: 'Connected',
                 callEnded: 'Call ended',
-                countryBlocked: '📵 Call blocked: users are in different countries'
+                countryBlocked: '📵 Call blocked: users are in different countries',
+                infoModalTitle: 'ℹ️ Information',
+                gotIt: '👍 Got it'
             },
             ta: {
                 appTitle: 'அரட்டை',
@@ -2237,7 +2357,9 @@
                 calling: 'அழைக்கிறது...',
                 connected: 'இணைக்கப்பட்டது',
                 callEnded: 'அழைப்பு முடிந்தது',
-                countryBlocked: '📵 நாடு வேறுபாடு காரணமாக அழைப்பு தடுக்கப்பட்டது'
+                countryBlocked: '📵 நாடு வேறுபாடு காரணமாக அழைப்பு தடுக்கப்பட்டது',
+                infoModalTitle: 'ℹ️ தகவல்',
+                gotIt: '👍 புரிந்தது'
 
             }
         };
@@ -2343,6 +2465,8 @@
                     document.getElementById('statusText').textContent = username + ' • ' + t.groupChat;
                     addMessage('System', t.connectedSuccess, 'system');
                     requestNotificationPermission();
+
+                    setTimeout(showInfoModal, 500);
                     break;
                 case 'auth_error':
                     alert(data.message);
@@ -3261,7 +3385,6 @@
         }
 
         function updateUILanguage() {
-
             const t = translations[currentLanguage];
 
             document.documentElement.lang = currentLanguage;
@@ -3275,7 +3398,6 @@
             document.getElementById('connectBtn').textContent = t.connectBtn;
             document.getElementById('statusText').textContent = t.connecting;
 
-
             document.getElementById('chatTitle').textContent = t.chatTitle;
             document.getElementById('usersBtnText').textContent = t.usersBtn;
             document.getElementById('groupBtnText').textContent = t.groupBtn;
@@ -3285,7 +3407,15 @@
             document.getElementById('messageInput').placeholder = t.typeMessage;
             document.getElementById('fileModalTitle').textContent = t.incomingFileTitle;
 
+            const infoModalTitle = document.getElementById('infoModalTitle');
+            if (infoModalTitle) {
+                infoModalTitle.textContent = t.infoModalTitle;
+            }
 
+            const infoModalBtn = document.getElementById('infoModalBtn');
+            if (infoModalBtn) {
+                infoModalBtn.textContent = t.gotIt;
+            }
 
             if (username && currentMode === 'group') {
                 document.getElementById('statusText').textContent = username + ' • ' + t.groupChat;
@@ -3454,6 +3584,50 @@
             );
 
             btn.textContent = isSpeakerOn ? '🔊' : '📞';
+        }
+
+
+        function showInfoModal() {
+            const t = translations[currentLanguage];
+
+            const infoModalTitle = document.getElementById('infoModalTitle');
+            if (infoModalTitle) {
+                infoModalTitle.textContent = t.infoModalTitle;
+            }
+
+            const infoModalBtn = document.getElementById('infoModalBtn');
+            if (infoModalBtn) {
+                infoModalBtn.textContent = t.gotIt;
+            }
+
+            const content = currentLanguage === 'ta'
+                ? `
+                    👋 <b>அரட்டையை தொடங்குவதற்கு முன் ஒரு சிறிய தகவல்…</b><br><br>
+                    • இது ஒரு <b>தனிப்பட்ட உரையாடல்</b>. பக்கத்தை புதுப்பித்தால் <b>புதிய உரையாடல்</b> தொடங்கும்.<br>
+                    • <b>செய்திகள் அல்லது கோப்புகள் எங்கும் சேமிக்கப்படவில்லை</b>.<br>
+                    • அனைத்து பயனர்களும் ஆரம்பத்தில் <b>குழு அரட்டையில்</b> இணைக்கப்படுவார்கள்.<br>
+                    • <b>தனிப்பட்ட செய்திகள் மஞ்சள் நிற பெட்டியில்</b> காண்பிக்கப்படும்.<br>
+                    • <b>தனிப்பட்ட செய்தி அனுப்ப</b>, <b>உறுப்பினர்கள் → Chat</b> பொத்தானை அழுத்தவும்.<br>
+                    • <b>ஒருவருக்கு ஒருவர் அழைப்பு</b> வசதி உள்ளது (ஒரே நாட்டுக்குள் மட்டும்). 🌍<br><br>
+                    😊 மகிழ்ச்சியாக பேசுங்கள்!
+                `
+                : `
+                    👋 <b>Welcome! Before you start chatting…</b><br><br>
+                    • This is a <b>private chat</b>. Refreshing the page starts a <b>new conversation</b>.<br>
+                    • <b>Messages and files are not stored anywhere</b>.<br>
+                    • All users are <b>initially connected to Group chat</b>.<br>
+                    • <b>Private messages appear in a yellow bubble</b>.<br>
+                    • To send a <b>private message</b>, click <b>Users → Chat</b>.<br>
+                    • <b>One-to-one calls are available</b> (within the same country only). 🌍<br><br>
+                    😊 Enjoy chatting!
+                `;
+
+            document.getElementById('infoModalContent').innerHTML = content;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').style.display = 'none';
         }
 
 
