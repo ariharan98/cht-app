@@ -895,6 +895,38 @@
             justify-content: center;
         }
 
+        .btn-video-call {
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+
+        #videoContainer {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        #remoteVideo {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+        }
+
+        #localVideo {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 120px;
+            height: 90px;
+            border-radius: 12px;
+            border: 2px solid white;
+            object-fit: cover;
+        }
+
         @keyframes fadeSlideUp {
             from {
                 opacity: 0;
@@ -1248,6 +1280,16 @@
 
         body.light-theme .call-btn.mute:hover {
             background: rgba(100, 116, 139, 0.2);
+        }
+
+        body.light-theme .btn-video-call {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+            color: #2563eb;
+        }
+
+        body.light-theme .btn-video-call:hover {
+            background: rgba(59, 130, 246, 0.2);
         }
 
         .language-toggle {
@@ -1987,6 +2029,10 @@
     <div id="callModal" class="call-modal">
         <div class="call-container">
             <div class="call-avatar" id="callAvatar">A</div>
+            <div id="videoContainer" style="display: none;">
+                <video id="remoteVideo" autoplay playsinline style="width: 100%; border-radius: 20px;"></video>
+                <video id="localVideo" autoplay muted playsinline></video>
+            </div>
             <div class="call-name" id="callName">User</div>
             <div class="call-status" id="callStatus">Calling...</div>
             <div class="call-timer" id="callTimer" style="display: none;">00:00</div>
@@ -1994,6 +2040,9 @@
             <div class="call-controls" id="activeCallControls" style="display: none;">
                 <button class="call-btn mute" id="muteBtn" onclick="toggleMute()">
                     🎤
+                </button>
+                <button class="call-btn mute" id="cameraBtn" onclick="toggleCamera()" style="display: none;">
+                    📹
                 </button>
                 <button class="call-btn mute" id="speakerBtn" onclick="toggleSpeaker()">
                     🔊
@@ -2017,7 +2066,6 @@
 
     <audio id="remoteAudio" autoplay></audio>
 
-
     <script>
         let ws = null;
         let username = '';
@@ -2036,6 +2084,9 @@
         let currentCallUser = '';
         let isCallInitiator = false;
         let myCountryCode = null;
+        let isVideoCall = false;
+        let localVideoStream = null;
+        let cameraEnabled = true;
 
         const translations = {
             en: {
@@ -2161,7 +2212,7 @@
                 connected: 'இணைக்கப்பட்டது',
                 callEnded: 'அழைப்பு முடிந்தது',
                 countryBlocked: '📵 நாடு வேறுபாடு காரணமாக அழைப்பு தடுக்கப்பட்டது'
-                
+
             }
         };
 
@@ -2254,26 +2305,13 @@
             }
         });
 
-        async function detectMyCountry() {
-            try {
-                const res = await fetch('https://ipwho.is/');
-                const data = await res.json();
-
-                if (data.success) {
-                    myCountryCode = data.country_code;
-                }
-            } catch (e) {
-                alert('Country detection failed');
-            }
-        }
-
-
 
         function handleMessage(data) {
             const t = translations[currentLanguage];
 
             switch (data.type) {
                 case 'auth_success':
+                    myCountryCode = data.country || null;
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('chatScreen').style.display = 'flex';
                     document.getElementById('statusText').textContent = username + ' • ' + t.groupChat;
@@ -2323,7 +2361,7 @@
                     showFileSaveDialog(data.sender, data.fileName, data.fileData, data.fileSize);
                     break;
                 case 'call_request':
-                    handleIncomingCall(data.from, data.country);
+                    handleIncomingCall(data.from, data.callType);
                     break;
                 case 'call_accepted':
                     handleCallAccepted();
@@ -2351,6 +2389,15 @@
                     );
                     cleanupCall();
                     break;
+                case 'call_failed':
+                    addMessage(
+                        'System',
+                        translations[currentLanguage].inCall || 'User is busy',
+                        'system'
+                    );
+                    cleanupCall();
+                    break;
+
             }
         }
 
@@ -2665,12 +2712,30 @@
                         };
                     }
 
+
+                    const videoCallBtn = document.createElement('button');
+                    videoCallBtn.className = 'btn-call btn-video-call';
+
+                    if (user.callState !== 'idle') {
+                        videoCallBtn.textContent = '📹';
+                        videoCallBtn.disabled = true;
+                        videoCallBtn.style.opacity = '0.6';
+                        videoCallBtn.style.cursor = 'not-allowed';
+                    } else {
+                        videoCallBtn.innerHTML = '📹';
+                        videoCallBtn.onclick = () => {
+                            initiateCall(user.name, true);
+                            closeUserModal();
+                        };
+                    }
+
                     const chatBtn = document.createElement('button');
                     chatBtn.className = 'btn-chat';
                     chatBtn.textContent = t.chatBtn;
                     chatBtn.onclick = () => startPrivateChat(user.name);
 
                     userActions.appendChild(callBtn);
+                    userActions.appendChild(videoCallBtn);
                     userActions.appendChild(chatBtn);
                     userItem.appendChild(userActions);
                 }
@@ -2746,10 +2811,15 @@
         }
 
         // WebRTC Functions
-        async function initiateCall(targetUser) {
+        async function initiateCall(targetUser, videoEnabled = false) {
 
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: videoEnabled
+                });
+
+                isVideoCall = videoEnabled;
 
                 currentCallUser = targetUser;
                 isCallInitiator = true;
@@ -2758,7 +2828,7 @@
                     type: 'call_request',
                     to: targetUser,
                     from: username,
-                    country: myCountryCode
+                    callType: isVideoCall ? 'video' : 'audio'
                 }));
 
                 showCallModal(targetUser, 'outgoing');
@@ -2769,23 +2839,14 @@
             }
         }
 
-        async function handleIncomingCall(caller, callerCountry) {
+        async function handleIncomingCall(caller, callType) {
+            isVideoCall = (callType === 'video');
 
             if (currentCallUser) {
                 ws.send(JSON.stringify({
                     type: 'call_rejected',
                     to: caller,
                     from: username
-                }));
-                return;
-            }
-
-            if (myCountryCode && callerCountry && myCountryCode !== callerCountry) {
-                ws.send(JSON.stringify({
-                    type: 'call_rejected',
-                    to: caller,
-                    from: username,
-                    reason: 'DIFFERENT_COUNTRY'
                 }));
                 return;
             }
@@ -2806,7 +2867,10 @@
 
         async function acceptCall() {
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: isVideoCall
+                });
 
                 ws.send(JSON.stringify({
                     type: 'call_accepted',
@@ -2855,7 +2919,7 @@
             let message = `${currentCallUser} ${t.callRejected || 'rejected the call'}`;
 
             if (reason === 'DIFFERENT_COUNTRY') {
-                message =  translations[currentLanguage].countryBlocked;
+                message = translations[currentLanguage].countryBlocked;
             }
 
             addMessage('System', message, 'system');
@@ -2875,9 +2939,16 @@
             });
 
             peerConnection.ontrack = (event) => {
-                const remoteAudio = document.getElementById('remoteAudio');
-                if (remoteAudio) {
-                    remoteAudio.srcObject = event.streams[0];
+                if (isVideoCall && event.track.kind === 'video') {
+                    const remoteVideo = document.getElementById('remoteVideo');
+                    if (remoteVideo) {
+                        remoteVideo.srcObject = event.streams[0];
+                    }
+                } else {
+                    const remoteAudio = document.getElementById('remoteAudio');
+                    if (remoteAudio) {
+                        remoteAudio.srcObject = event.streams[0];
+                    }
                 }
             };
 
@@ -2901,6 +2972,31 @@
                     endCall();
                 }
             };
+        }
+
+        function initiateVideoCall(targetUser) {
+            initiateCall(targetUser, true);
+        }
+
+        function toggleCamera() {
+            if (localStream && isVideoCall) {
+                const videoTrack = localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    videoTrack.enabled = !videoTrack.enabled;
+                    cameraEnabled = videoTrack.enabled;
+
+                    const cameraBtn = document.getElementById('cameraBtn');
+                    if (cameraBtn) {
+                        if (cameraEnabled) {
+                            cameraBtn.classList.remove('active');
+                            cameraBtn.textContent = '📹';
+                        } else {
+                            cameraBtn.classList.add('active');
+                            cameraBtn.textContent = '📵';
+                        }
+                    }
+                }
+            }
         }
 
         async function handleOffer(offer, from) {
@@ -2972,7 +3068,6 @@
         }
 
         function cleanupCall() {
-
             if (callTimer) {
                 clearInterval(callTimer);
                 callTimer = null;
@@ -2988,6 +3083,19 @@
                 peerConnection = null;
             }
 
+
+            isVideoCall = false;
+            cameraEnabled = true;
+
+
+            const videoContainer = document.getElementById('videoContainer');
+            const localVideo = document.getElementById('localVideo');
+            const remoteVideo = document.getElementById('remoteVideo');
+
+            if (videoContainer) videoContainer.style.display = 'none';
+            if (localVideo) localVideo.srcObject = null;
+            if (remoteVideo) remoteVideo.srcObject = null;
+
             closeCallModal();
             currentCallUser = '';
             isMuted = false;
@@ -3002,6 +3110,8 @@
             const timer = document.getElementById('callTimer');
             const activeControls = document.getElementById('activeCallControls');
             const incomingControls = document.getElementById('incomingCallControls');
+            const videoContainer = document.getElementById('videoContainer');
+            const cameraBtn = document.getElementById('cameraBtn');
             const t = translations[currentLanguage];
 
             avatar.textContent = targetUser[0].toUpperCase();
@@ -3010,6 +3120,9 @@
             activeControls.style.display = 'none';
             incomingControls.style.display = 'none';
             timer.style.display = 'none';
+            videoContainer.style.display = 'none';
+            avatar.style.display = 'flex';
+            if (cameraBtn) cameraBtn.style.display = 'none';
 
             if (state === 'incoming') {
                 status.textContent = t.incomingCall || 'Incoming call...';
@@ -3017,10 +3130,22 @@
             } else if (state === 'outgoing') {
                 status.textContent = t.calling || 'Calling...';
                 activeControls.style.display = 'flex';
+                if (isVideoCall && cameraBtn) cameraBtn.style.display = 'flex';
             } else if (state === 'active') {
                 status.textContent = t.connected || 'Connected';
                 activeControls.style.display = 'flex';
                 timer.style.display = 'block';
+
+                if (isVideoCall) {
+                    videoContainer.style.display = 'block';
+                    avatar.style.display = 'none';
+                    if (cameraBtn) cameraBtn.style.display = 'flex';
+
+                    const localVideo = document.getElementById('localVideo');
+                    if (localStream && localVideo) {
+                        localVideo.srcObject = localStream;
+                    }
+                }
             }
 
             modal.style.display = 'flex';
@@ -3093,7 +3218,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.add('tamil');
-            detectMyCountry();
             updateUILanguage();
             document.getElementById('usernameInput').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') connect();
