@@ -2097,6 +2097,10 @@
         let onlineUsers = [];
         let currentLanguage = 'ta';
         const textarea = document.getElementById('messageInput');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const localVideo = document.getElementById('localVideo');
+        const remoteAudio = document.getElementById('remoteAudio');
+
 
         let peerConnection = null;
         let localStream = null;
@@ -2962,19 +2966,20 @@
 
             peerConnection.ontrack = (event) => {
 
-                if (isVideoCall && event.track.kind === 'video') {
-                    const remoteVideo = document.getElementById('remoteVideo');
-                    if (remoteVideo) {
-                        remoteVideo.srcObject = event.streams[0];
-                    }
-                }
+                event.streams.forEach(stream => {
 
-                if (event.track.kind === 'audio') {
-                    const remoteAudio = document.getElementById('remoteAudio');
-                    if (remoteAudio) {
-                        remoteAudio.srcObject = event.streams[0];
+                    if (event.track.kind === 'video') {
+                        if (remoteVideo) {
+                            remoteVideo.srcObject = stream;
+                        }
                     }
-                }
+
+                    if (event.track.kind === 'audio') {
+                        if (remoteAudio) {
+                            remoteAudio.srcObject = stream;
+                        }
+                    }
+                });
             };
 
             peerConnection.onicecandidate = (event) => {
@@ -3027,7 +3032,10 @@
         async function handleOffer(offer, from) {
 
             if (!localStream) {
-                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: isVideoCall
+                });
             }
 
             if (!peerConnection) {
@@ -3035,12 +3043,13 @@
             }
 
             await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
             const answer = await peerConnection.createAnswer();
             await peerConnection.setLocalDescription(answer);
 
             ws.send(JSON.stringify({
                 type: 'webrtc_answer',
-                answer: answer,
+                answer,
                 to: from,
                 from: username
             }));
@@ -3112,8 +3121,6 @@
             cameraEnabled = true;
 
             const videoContainer = document.getElementById('videoContainer');
-            const localVideo = document.getElementById('localVideo');
-            const remoteVideo = document.getElementById('remoteVideo');
             const callContainer = document.querySelector('.call-container');
             const activeControls = document.getElementById('activeCallControls');
             const timer = document.getElementById('callTimer');
@@ -3187,6 +3194,13 @@
 
                 if (isVideoCall) {
 
+                    videoContainer.style.display = 'block';
+
+                    if (remoteVideo) {
+                        remoteVideo.setAttribute('playsinline', true);
+                        remoteVideo.muted = false;
+                    }
+
                     callContainer.style.padding = '0';
                     callContainer.style.maxWidth = '100vw';
                     callContainer.style.width = '100%';
@@ -3220,8 +3234,7 @@
 
                     if (cameraBtn) cameraBtn.style.display = 'flex';
 
-                    const localVideo = document.getElementById('localVideo');
-                    const remoteVideo = document.getElementById('remoteVideo');
+
 
                     if (localStream && localVideo) {
                         localVideo.srcObject = localStream;
