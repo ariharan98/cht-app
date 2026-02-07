@@ -922,11 +922,11 @@
 
         #localVideo {
             position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 120px;
-            height: 160px;
-            border-radius: 12px;
+            bottom: 100px;
+            right: 15px;
+            width: 80px;
+            height: 106px;
+            border-radius: 10px;
             border: 2px solid white;
             object-fit: cover;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
@@ -1561,10 +1561,10 @@
             }
 
             #localVideo {
-                width: 90px;
-                height: 120px;
-                bottom: 15px;
-                right: 15px;
+                width: 70px;
+                height: 93px;
+                bottom: 90px;
+                right: 12px;
             }
         }
 
@@ -1798,10 +1798,11 @@
             }
 
             #localVideo {
-                width: 80px;
-                height: 106px;
-                bottom: 10px;
+                width: 65px;
+                height: 87px;
+                bottom: 85px;
                 right: 10px;
+                border-radius: 8px;
             }
         }
 
@@ -2960,12 +2961,15 @@
             });
 
             peerConnection.ontrack = (event) => {
+
                 if (isVideoCall && event.track.kind === 'video') {
                     const remoteVideo = document.getElementById('remoteVideo');
                     if (remoteVideo) {
                         remoteVideo.srcObject = event.streams[0];
                     }
-                } else {
+                }
+
+                if (event.track.kind === 'audio') {
                     const remoteAudio = document.getElementById('remoteAudio');
                     if (remoteAudio) {
                         remoteAudio.srcObject = event.streams[0];
@@ -3190,25 +3194,35 @@
                     callContainer.style.borderRadius = '0';
 
                     videoContainer.style.display = 'block';
+                    videoContainer.style.position = 'relative';
+                    videoContainer.style.width = '100%';
+                    videoContainer.style.height = '100%';
+
                     avatar.style.display = 'none';
                     name.style.display = 'none';
                     status.style.display = 'none';
 
                     activeControls.style.position = 'absolute';
-                    activeControls.style.bottom = '30px';
+                    activeControls.style.bottom = '20px';
                     activeControls.style.left = '50%';
                     activeControls.style.transform = 'translateX(-50%)';
                     activeControls.style.zIndex = '20';
 
                     timer.style.position = 'absolute';
-                    timer.style.top = '20px';
+                    timer.style.top = '30px';
                     timer.style.left = '50%';
                     timer.style.transform = 'translateX(-50%)';
                     timer.style.zIndex = '20';
+                    timer.style.fontSize = '18px';
+                    timer.style.color = '#22c55e';
+                    timer.style.fontWeight = '600';
+                    timer.style.textShadow = '0 2px 4px rgba(0,0,0,0.5)';
 
                     if (cameraBtn) cameraBtn.style.display = 'flex';
 
                     const localVideo = document.getElementById('localVideo');
+                    const remoteVideo = document.getElementById('remoteVideo');
+
                     if (localStream && localVideo) {
                         localVideo.srcObject = localStream;
                     }
