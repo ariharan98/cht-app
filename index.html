@@ -904,16 +904,20 @@
         #videoContainer {
             position: relative;
             width: 100%;
-            max-width: 500px;
-            margin: 20px auto;
-            border-radius: 20px;
+            height: 100%;
+            max-width: none;
+            margin: 0;
+            border-radius: 0;
             overflow: hidden;
+            background: #000;
         }
 
         #remoteVideo {
             width: 100%;
-            height: auto;
-            border-radius: 20px;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0;
+            display: block;
         }
 
         #localVideo {
@@ -921,11 +925,14 @@
             bottom: 20px;
             right: 20px;
             width: 120px;
-            height: 90px;
+            height: 160px;
             border-radius: 12px;
             border: 2px solid white;
             object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 10;
         }
+
 
         @keyframes fadeSlideUp {
             from {
@@ -1552,6 +1559,13 @@
                 padding: 6px 15px;
                 font-size: 12px;
             }
+
+            #localVideo {
+                width: 90px;
+                height: 120px;
+                bottom: 15px;
+                right: 15px;
+            }
         }
 
 
@@ -1781,6 +1795,13 @@
                 padding: 5px 12px;
                 font-size: 11px;
                 border-radius: 6px;
+            }
+
+            #localVideo {
+                width: 80px;
+                height: 106px;
+                bottom: 10px;
+                right: 10px;
             }
         }
 
@@ -3083,18 +3104,41 @@
                 peerConnection = null;
             }
 
-
             isVideoCall = false;
             cameraEnabled = true;
-
 
             const videoContainer = document.getElementById('videoContainer');
             const localVideo = document.getElementById('localVideo');
             const remoteVideo = document.getElementById('remoteVideo');
+            const callContainer = document.querySelector('.call-container');
+            const activeControls = document.getElementById('activeCallControls');
+            const timer = document.getElementById('callTimer');
 
             if (videoContainer) videoContainer.style.display = 'none';
             if (localVideo) localVideo.srcObject = null;
             if (remoteVideo) remoteVideo.srcObject = null;
+
+            if (callContainer) {
+                callContainer.style.padding = '';
+                callContainer.style.maxWidth = '';
+                callContainer.style.width = '';
+                callContainer.style.height = '';
+                callContainer.style.borderRadius = '';
+            }
+
+            if (activeControls) {
+                activeControls.style.position = '';
+                activeControls.style.bottom = '';
+                activeControls.style.left = '';
+                activeControls.style.transform = '';
+            }
+
+            if (timer) {
+                timer.style.position = '';
+                timer.style.top = '';
+                timer.style.left = '';
+                timer.style.transform = '';
+            }
 
             closeCallModal();
             currentCallUser = '';
@@ -3112,6 +3156,7 @@
             const incomingControls = document.getElementById('incomingCallControls');
             const videoContainer = document.getElementById('videoContainer');
             const cameraBtn = document.getElementById('cameraBtn');
+            const callContainer = document.querySelector('.call-container');
             const t = translations[currentLanguage];
 
             avatar.textContent = targetUser[0].toUpperCase();
@@ -3137,8 +3182,30 @@
                 timer.style.display = 'block';
 
                 if (isVideoCall) {
+
+                    callContainer.style.padding = '0';
+                    callContainer.style.maxWidth = '100vw';
+                    callContainer.style.width = '100%';
+                    callContainer.style.height = '100vh';
+                    callContainer.style.borderRadius = '0';
+
                     videoContainer.style.display = 'block';
                     avatar.style.display = 'none';
+                    name.style.display = 'none';
+                    status.style.display = 'none';
+
+                    activeControls.style.position = 'absolute';
+                    activeControls.style.bottom = '30px';
+                    activeControls.style.left = '50%';
+                    activeControls.style.transform = 'translateX(-50%)';
+                    activeControls.style.zIndex = '20';
+
+                    timer.style.position = 'absolute';
+                    timer.style.top = '20px';
+                    timer.style.left = '50%';
+                    timer.style.transform = 'translateX(-50%)';
+                    timer.style.zIndex = '20';
+
                     if (cameraBtn) cameraBtn.style.display = 'flex';
 
                     const localVideo = document.getElementById('localVideo');
