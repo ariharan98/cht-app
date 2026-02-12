@@ -2434,7 +2434,6 @@
                 fileSent: '📎 File sent',
                 fileReadError: 'Failed to read file',
                 callBtn: 'Call',
-                calling: 'Calling...',
                 incomingCall: 'Incoming call... ',
                 isCalligYou: ' is calling you',
                 connected: 'Connected',
@@ -2449,11 +2448,31 @@
                 acceptCall: 'Accept',
                 rejectCall: 'Reject',
                 calling: 'Calling...',
-                connected: 'Connected',
-                callEnded: 'Call ended',
+                busy: 'Busy',
                 countryBlocked: '📵 Call blocked: users are in different countries',
                 infoModalTitle: 'ℹ️ Information',
-                gotIt: '👍 Got it'
+                gotIt: '👍 Got it',
+                you: 'You',
+                receivingFileFrom: 'Receiving',
+                from: 'from',
+                fileTransferCancelled: 'File transfer cancelled',
+                fileTransferCancelledBySender: 'File transfer cancelled by sender',
+                fileTransferIncomplete: 'File transfer incomplete',
+                sending: 'Sending',
+                receiving: 'Receiving',
+                previewNotAvailable: 'Preview not available',
+                downloadToView: 'Please download to view',
+                previewError: 'Error loading file preview',
+                sendingFile: 'Sending',
+                downloadPdf: 'Download PDF',
+                preview: 'Preview',
+                filePreviewTitle: 'File Preview',
+                speakerNotSupported: 'Speaker switching is not supported in this browser.',
+                noAudioOutput: 'No audio output devices found',
+                connectionFailed: 'Failed to connect',
+                chunks: 'chunks',
+                callTimedOut: 'Call timed out'
+
             },
             ta: {
                 appTitle: 'அரட்டை',
@@ -2498,7 +2517,6 @@
                 fileSent: '📎 கோப்பு அனுப்பப்பட்டது',
                 fileReadError: 'கோப்பை படிக்க முடியவில்லை',
                 callBtn: 'அழைப்பு',
-                calling: 'அழைக்கிறது...',
                 incomingCall: 'உள்வரும் அழைப்பு... ',
                 isCalligYou: ' உங்களை அழைக்கிறார்கள்',
                 connected: 'இணைக்கப்பட்டது',
@@ -2513,13 +2531,32 @@
                 acceptCall: 'ஏற்கவும்',
                 rejectCall: 'நிராகரி',
                 calling: 'அழைக்கிறது...',
-                connected: 'இணைக்கப்பட்டது',
-                callEnded: 'அழைப்பு முடிந்தது',
+                busy: 'அழைப்பில் உள்ளார்',
                 countryBlocked: '📵 நாடு வேறுபாடு காரணமாக அழைப்பு தடுக்கப்பட்டது',
                 infoModalTitle: 'ℹ️ தகவல்',
-                gotIt: '👍 புரிந்தது'
-
+                gotIt: '👍 புரிந்தது',
+                you: 'நீங்கள்',
+                receivingFileFrom: 'பெறப்படுகிறது',
+                from: 'இருந்து',
+                fileTransferCancelled: 'கோப்பு அனுப்புதல் ரத்து செய்யப்பட்டது',
+                fileTransferCancelledBySender: 'அனுப்புநர் கோப்பு அனுப்புதலை ரத்து செய்தார்',
+                fileTransferIncomplete: 'கோப்பு அனுப்புதல் முழுமையடையவில்லை',
+                sending: 'அனுப்பப்படுகிறது',
+                receiving: 'பெறப்படுகிறது',
+                previewNotAvailable: 'முன்னோட்டம் கிடைக்கவில்லை',
+                downloadToView: 'பார்க்க பதிவிறக்கம் செய்யவும்',
+                previewError: 'முன்னோட்டத்தை ஏற்ற முடியவில்லை',
+                sendingFile: 'அனுப்பப்படுகிறது',
+                downloadPdf: 'PDF பதிவிறக்கு',
+                preview: 'முன்னோட்டம்',
+                filePreviewTitle: 'கோப்பு முன்னோட்டம்',
+                speakerNotSupported: 'இந்த உலாவியில் ஒலிபெருக்கி மாற்றம் ஆதரிக்கப்படவில்லை.',
+                noAudioOutput: 'ஒலி வெளியீட்டு சாதனங்கள் கிடைக்கவில்லை',
+                connectionFailed: 'இணைப்பு தோல்வியடைந்தது',
+                chunks: 'துண்டுகள்',
+                callTimedOut: 'அழைப்பு நேரம் முடிந்தது',
             }
+
         };
 
         const configuration = {
@@ -2573,7 +2610,7 @@
 
 
             } catch (error) {
-                alert('Failed to connect: ' + error.message);
+                alert(`${translations[currentLanguage].connectionFailed}: ${error.message}`);
             }
         }
 
@@ -2692,7 +2729,7 @@
                 case 'call_timeout':
                     if (!currentCallUser) break;
                     addMessage('System',
-                        translations[currentLanguage].callEnded || 'Call timed out',
+                        translations[currentLanguage].callTimedOut ,
                         'system'
                     );
                     cleanupCall();
@@ -2700,7 +2737,7 @@
                 case 'call_failed':
                     addMessage(
                         'System',
-                        translations[currentLanguage].inCall || 'User is busy',
+                        translations[currentLanguage].busy || 'User is busy',
                         'system'
                     );
                     cleanupCall();
@@ -2716,7 +2753,7 @@
                     showProgress(data.fileName, 'receive');
 
                     addMessage('System',
-                        `Receiving ${data.fileName} from ${data.sender} (${formatFileSize(data.fileSize)})...`,
+                        `${t.receivingFileFrom} ${data.fileName} ${t.from} ${data.sender} (${formatFileSize(data.fileSize)})...`,
                         'system'
                     );
                     break;
@@ -2764,7 +2801,7 @@
                     currentFileSize = 0;
 
                     hideProgress();
-                    addMessage('System', 'File transfer cancelled by sender', 'system');
+                    addMessage('System', translations[currentLanguage].fileTransferCancelledBySender, 'system');
                     break;
 
 
@@ -2795,7 +2832,7 @@
             <div class="file-dialog-buttons">
                 <button class="btn-dialog secondary"
                     onclick="openPreviewModal('${fileData}', '${fileName}', ${isBlob})">
-                    👁 Preview
+                    👁 ${translations[currentLanguage].preview}
                 </button>
 
                 <button class="btn-dialog secondary"
@@ -2812,7 +2849,7 @@
 
             modal.style.display = 'flex';
         }
-        
+
         function saveFile(fileName, fileData, sender, isBlob = false) {
 
             const link = document.createElement('a');
@@ -2978,7 +3015,7 @@
                     callBtn.className = 'btn-call';
 
                     if (user.callState !== 'idle') {
-                        callBtn.textContent = t.inCall || 'Busy';
+                        callBtn.textContent = t.inCall  
                         callBtn.disabled = true;
                         callBtn.style.opacity = '0.6';
                         callBtn.style.cursor = 'not-allowed';
@@ -3052,7 +3089,7 @@
 
                 addMessage(
                     'System',
-                    `Sending ${file.name} (${formatFileSize(file.size)}) [${i + 1}/${fileArray.length}]`,
+                    `${translations[currentLanguage].sendingFile} ${file.name} (${formatFileSize(file.size)}) [${i + 1}/${fileArray.length}]`,
                     'system'
                 );
 
@@ -3096,7 +3133,7 @@
                         receiver: receiver
                     }));
                     hideProgress();
-                    addMessage('System', 'File transfer cancelled', 'system');
+                    addMessage('System', translations[currentLanguage].fileTransferCancelled, 'system');
                     return;
                 }
 
@@ -3158,7 +3195,7 @@
 
             for (let i = 0; i < totalChunksExpected; i++) {
                 if (!receivedChunks[i]) {
-                    addMessage('System', 'File transfer incomplete', 'system');
+                    addMessage('System', translations[currentLanguage].fileTransferIncomplete, 'system');
                     hideProgress();
                     return;
                 }
@@ -3201,7 +3238,7 @@
 
             for (let i = 0; i < fileInfo.totalChunks; i++) {
                 if (!fileInfo.chunks[i]) {
-                    addMessage('System', `File transfer incomplete: ${fileInfo.fileName}`, 'system');
+                    addMessage('System', `${translations[currentLanguage].fileTransferIncomplete}: ${fileInfo.fileName}`, 'system');
                     isShowingFileDialog = false;
                     processFileQueue();
                     return;
@@ -3228,8 +3265,8 @@
             const t = translations[currentLanguage];
 
             fileNameEl.textContent = type === 'send'
-                ? `Sending: ${fileName}`
-                : `Receiving: ${fileName}`;
+                ? `${t.sending}: ${fileName}`
+                : `${t.receiving}: ${fileName}`;
 
             document.getElementById('progressBar').style.width = '0%';
             document.getElementById('progressPercent').textContent = '0%';
@@ -3239,11 +3276,12 @@
         }
 
         function updateProgress(current, total, type = 'send') {
+            const t = translations[currentLanguage];
             const percent = Math.round((current / total) * 100);
 
             document.getElementById('progressBar').style.width = percent + '%';
             document.getElementById('progressPercent').textContent = percent + '%';
-            document.getElementById('progressInfo').textContent = `${current} / ${total} chunks`;
+            document.getElementById('progressInfo').textContent = `${current} / ${total} ${t.chunks}`;
 
             if (current >= total) {
                 setTimeout(() => {
@@ -3264,7 +3302,7 @@
                 receiver: currentMode === 'private' ? privateReceiver : 'GROUP'
             }));
 
-            addMessage('System', 'File transfer cancelled', 'system');
+            addMessage('System', translations[currentLanguage].fileTransferCancelled, 'system');
         }
 
 
@@ -3713,6 +3751,7 @@
             document.getElementById('modalTitle').textContent = t.modalTitle;
             document.getElementById('messageInput').placeholder = t.typeMessage;
             document.getElementById('fileModalTitle').textContent = t.incomingFileTitle;
+            document.querySelector('#previewModal h3').textContent = t.filePreviewTitle;
 
             const infoModalTitle = document.getElementById('infoModalTitle');
             if (infoModalTitle) {
@@ -3864,7 +3903,7 @@
                     <div style="padding:10px;text-align:center;">
                         <a href="${fileData}" download="${fileName}" 
                         style="color:#22c55e;text-decoration:none;font-weight:500;">
-                        ⬇️ Download PDF
+                        ⬇️ ${translations[currentLanguage].downloadPdf}
                         </a>
                     </div>
     `;
@@ -3875,11 +3914,11 @@
                     const text = await response.text();
                     inner = `<pre style="white-space:pre;overflow-x:auto;font-family:monospace;font-size:13px;line-height:1.6;padding:12px;background:rgba(0,0,0,0.35);border-radius:10px;">${escapeHtml(text)}</pre>`;
                 } catch (e) {
-                    inner = `<div style="padding:20px;text-align:center;">Error loading file preview</div>`;
+                    inner = `<div style="padding:20px;text-align:center;">${translations[currentLanguage].previewError}</div>`;
                 }
             }
             else {
-                inner = `<div style="padding:20px;text-align:center;">📄 Preview not available<br><span style="font-size:12px;opacity:0.8;">Please download to view</span></div>`;
+                inner = `<div style="padding:20px;text-align:center;">📄 ${translations[currentLanguage].previewNotAvailable}<br><span style="font-size:12px;opacity:0.8;">${translations[currentLanguage].downloadToView}</span></div>`;
             }
 
             content.innerHTML = `<div class="preview-wrapper"><div class="preview-content">${inner}</div></div>`;
@@ -3905,7 +3944,7 @@
 
 
             if (!audio || typeof audio.setSinkId !== 'function') {
-                alert('Speaker / phone switching is not supported in this browser.');
+                alert(`${translations[currentLanguage].speakerNotSupported}`);
                 return;
             }
 
@@ -3913,7 +3952,7 @@
             const outputs = devices.filter(d => d.kind === 'audiooutput');
 
             if (!outputs.length) {
-                alert('No audio output devices found');
+                alert(`${translations[currentLanguage].noAudioOutput}`);
                 return;
             }
 
@@ -3946,7 +3985,7 @@
                     • அனைத்து பயனர்களும் ஆரம்பத்தில் <b>குழு அரட்டையில்</b> இணைக்கப்படுவார்கள்.<br>
                     • <b>தனிப்பட்ட செய்திகள் மஞ்சள் நிற பெட்டியில்</b> காண்பிக்கப்படும்.<br>
                     • <b>தனிப்பட்ட செய்தி அனுப்ப</b>, <b>உறுப்பினர்கள் → Chat</b> பொத்தானை அழுத்தவும்.<br>
-                    • <b>ஒருவருக்கு ஒருவர் அழைப்பு</b> வசதி உள்ளது (ஒரே நெட்வொர்க்கிற்குள் மட்டும்). 🌍<br><br>
+                    • <b>ஒருவருக்கு ஒருவர் அழைப்பு</b> வசதி உள்ளது (ஒரே பிணையத்திற்குள் மட்டும்). 🌍<br><br>
                     😊 மகிழ்ச்சியாக பேசுங்கள்!
                 `
                 : `
