@@ -983,6 +983,97 @@
             border-top: 2px solid rgba(224, 0, 0, 0.2);
         }
 
+        .file-progress {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid rgba(224, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            min-width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(45deg, #e00000, #ff6347);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-info {
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        .progress-cancel {
+            background: rgba(239, 68, 68, 0.2);
+            border: none;
+            color: #ef4444;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-percent-row {
+            text-align: right;
+            color: #22c55e;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        #fileModal .modal-content {
+            position: absolute;
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .progress-close {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #ccc;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-close:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+
 
 
         body.light-theme {
@@ -1356,6 +1447,15 @@
             background: rgba(102, 126, 234, 0.3);
         }
 
+        body.light-theme .file-progress {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(100, 116, 139, 0.3);
+        }
+
+        body.light-theme .progress-bar {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
         .language-toggle {
             top: 15px;
             right: 15px;
@@ -1645,6 +1745,23 @@
                 width: 100%;
                 padding: 14px 20px;
             }
+
+            .file-progress {
+                bottom: 80px;
+                right: 15px;
+                left: 15px;
+                min-width: auto;
+                max-width: calc(100% - 30px);
+                padding: 15px;
+            }
+
+            .progress-header {
+                font-size: 12px;
+            }
+
+            .progress-info {
+                font-size: 11px;
+            }
         }
 
 
@@ -1905,6 +2022,17 @@
                 padding: 12px 18px;
                 font-size: 13px;
             }
+
+            .file-progress {
+                bottom: 70px;
+                right: 10px;
+                left: 10px;
+                padding: 12px;
+            }
+
+            .progress-header {
+                font-size: 11px;
+            }
         }
 
         @media (hover: hover) and (pointer: fine) {
@@ -2107,7 +2235,7 @@
         <div class="messages-container" id="messagesContainer"></div>
 
         <div class="input-container">
-            <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)">
+            <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileSelect(event)">
             <button class="btn-icon" onclick="document.getElementById('fileInput').click()">
                 📎
             </button>
@@ -2189,17 +2317,34 @@
     <div id="infoModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>ℹ️ தகவல்</h3>
+                <h3 id="infoModalTitle">ℹ️ தகவல்</h3>
                 <button class="btn-close" onclick="closeInfoModal()">×</button>
             </div>
             <div style="padding:20px;font-size:14px;line-height:1.6;" id="infoModalContent"></div>
 
             <div class="info-modal-footer">
-                <button class="btn-dialog primary" onclick="closeInfoModal()">
+                <button id="infoModalBtn" class="btn-dialog primary" onclick="closeInfoModal()">
                     👍 புரிந்தது
                 </button>
             </div>
         </div>
+    </div>
+
+    <div id="fileProgress" class="file-progress">
+        <div class="progress-header">
+            <span id="progressFileName">Sending file...</span>
+            <div style="display:flex; gap:6px;">
+                <button class="progress-cancel" onclick="cancelFileTransfer()">✕</button>
+                <button class="progress-close" onclick="hideProgress()">—</button>
+            </div>
+        </div>
+        <div class="progress-percent-row">
+            <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-info" id="progressInfo">0 / 0 chunks</div>
     </div>
 
 
@@ -2214,6 +2359,13 @@
         let privateReceiver = '';
         let onlineUsers = [];
         let currentLanguage = 'ta';
+        let receivingFile = false;
+        let receivedChunks = [];
+        let totalChunksExpected = 0;
+        let currentFileName = '';
+        let currentFileSender = '';
+        let currentFileSize = 0;
+
         const textarea = document.getElementById('messageInput');
         const remoteVideo = document.getElementById('remoteVideo');
         const localVideo = document.getElementById('localVideo');
@@ -2231,6 +2383,12 @@
         let isVideoCall = false;
         let localVideoStream = null;
         let cameraEnabled = true;
+        let sendProgress = 0;
+        let receiveProgress = 0;
+        let progressInterval = null;
+        let transferCancelled = false;
+        let fileQueue = [];
+        let isShowingFileDialog = false;
 
         const translations = {
             en: {
@@ -2324,7 +2482,7 @@
                 fileNotSaved: ' - சேமிக்கப்படவில்லை',
                 largeFileSending: 'பெரிய கோப்பு அனுப்பப்படுகிறது : ',
                 pleaseWait: ' தயவுசெய்து காத்திருக்கவும்...',
-                incomingFile: 'பெறப்பட்ட கோப்பு',
+                incomingFile: 'உள்வரும் கோப்பு',
                 receivedFile: 'கோப்பு பெறப்பட்டது',
                 fileSize: 'அளவு',
                 sender: 'அனுப்பியவர்',
@@ -2334,7 +2492,7 @@
                 connectBtn: 'இணைக்கவும்',
                 typeMessage: 'செய்தியை உள்ளிடுங்கள்...',
                 chatBtn: 'அரட்டை',
-                incomingFileTitle: 'பெறப்பட்ட கோப்பு',
+                incomingFileTitle: 'உள்வரும் கோப்பு',
                 connectionError: 'இணைப்பு பிழை ஏற்பட்டது',
                 disconnected: 'துண்டிக்கப்பட்டது',
                 fileSent: '📎 கோப்பு அனுப்பப்பட்டது',
@@ -2547,6 +2705,68 @@
                     );
                     cleanupCall();
                     break;
+                case 'file_chunk_start':
+                    receivingFile = true;
+                    receivedChunks = [];
+                    totalChunksExpected = data.totalChunks;
+                    currentFileName = data.fileName;
+                    currentFileSender = data.sender;
+                    currentFileSize = data.fileSize;
+
+                    showProgress(data.fileName, 'receive');
+
+                    addMessage('System',
+                        `Receiving ${data.fileName} from ${data.sender} (${formatFileSize(data.fileSize)})...`,
+                        'system'
+                    );
+                    break;
+
+                case 'file_chunk':
+                    if (receivingFile) {
+                        receivedChunks[data.chunkIndex] = data.chunkData;
+
+                        const received = receivedChunks.filter(c => c).length;
+                        updateProgress(received, totalChunksExpected, 'receive');
+                    }
+                    break;
+
+                case 'file_chunk_end':
+                    if (receivingFile) {
+                        fileQueue.push({
+                            sender: currentFileSender,
+                            fileName: currentFileName,
+                            chunks: receivedChunks,
+                            size: currentFileSize,
+                            totalChunks: totalChunksExpected
+                        });
+
+                        receivingFile = false;
+                        receivedChunks = [];
+                        totalChunksExpected = 0;
+                        currentFileName = '';
+                        currentFileSender = '';
+                        currentFileSize = 0;
+
+                        hideProgress();
+
+                        setTimeout(() => {
+                            processFileQueue();
+                        }, 50);
+                    }
+                    break;
+
+                case 'file_transfer_cancel':
+                    receivingFile = false;
+                    receivedChunks = [];
+                    totalChunksExpected = 0;
+                    currentFileName = '';
+                    currentFileSender = '';
+                    currentFileSize = 0;
+
+                    hideProgress();
+                    addMessage('System', 'File transfer cancelled by sender', 'system');
+                    break;
+
 
             }
         }
@@ -2560,13 +2780,13 @@
         }
 
 
-        function showFileSaveDialog(sender, fileName, fileData, fileSize) {
+        function showFileSaveDialog(sender, fileName, fileData, fileSize, isBlob = false) {
             const modal = document.getElementById('fileModal');
             const content = document.getElementById('fileDialogContent');
             const t = translations[currentLanguage];
 
             content.innerHTML = `
-            <div class="file-dialog-info">
+             <div class="file-dialog-info">
                 <p><strong>${t.receivedFile}:</strong> ${fileName}</p>
                 <p><strong>${t.fileSize}:</strong> ${formatFileSize(fileSize)}</p>
                 <p><strong>${t.sender}:</strong> ${sender}</p>
@@ -2574,17 +2794,17 @@
 
             <div class="file-dialog-buttons">
                 <button class="btn-dialog secondary"
-                    onclick="openPreviewModal('${fileData.replace(/'/g, "\\'")}', '${fileName}')">
+                    onclick="openPreviewModal('${fileData}', '${fileName}', ${isBlob})">
                     👁 Preview
                 </button>
 
                 <button class="btn-dialog secondary"
                     onclick="closeFileDialog(false,'${sender}','${fileName}')">
-                    ${t.no}
+                     ${t.no}
                 </button>
 
                 <button class="btn-dialog primary"
-                    onclick="saveFile('${fileName}','${fileData}','${sender}')">
+                    onclick="saveFile('${fileName}','${fileData}','${sender}', ${isBlob})">
                     ${t.yes}
                 </button>
             </div>
@@ -2592,127 +2812,31 @@
 
             modal.style.display = 'flex';
         }
-
-
-        function renderFilePreview(fileData, fileName) {
-
-            const mime = getMimeType(fileData);
-
-
-            if (isArchiveFile(mime, fileName)) {
-                return `
-                <div class="preview-wrapper">
-                    <div class="preview-content" style="text-align:center;padding:20px;">
-                        📦 Archive preview not supported
-                    </div>
-                </div>`;
-            }
-
-            let inner = '';
-
-
-            if (mime.startsWith('image/')) {
-                inner = `<img src="${fileData}" alt="${fileName}">`;
-            }
-
-
-            else if (mime.startsWith('video/')) {
-                inner = `
-                <video controls playsinline>
-                    <source src="${fileData}" type="${mime}">
-                </video>`;
-            }
-
-
-            else if (mime.startsWith('audio/')) {
-                inner = `
-                <audio controls>
-                    <source src="${fileData}" type="${mime}">
-                </audio>`;
-            }
-
-
-            else if (mime === 'application/pdf') {
-                inner = `<iframe src="${fileData}"></iframe>`;
-            }
-
-
-            else if (isCodeFile(fileName, mime)) {
-                const text = decodeTextFromBase64(fileData);
-
-                inner = `
-                    <pre style="
-                        white-space: pre;
-                        overflow-x: auto;
-                        font-family: 'JetBrains Mono', monospace;
-                        font-size: 13px;
-                        line-height: 1.6;
-                        padding: 12px;
-                        background: rgba(0,0,0,0.35);
-                        border-radius: 10px;
-                    ">${escapeHtml(text)}</pre>`;
-            }
-
-
-            else if (mime === 'text/html') {
-                inner = `
-                <iframe src="${fileData}"
-                    sandbox
-                    style="width:100%;height:300px;border:none;">
-                </iframe>`;
-            } else {
-
-                inner = `
-            <div style="
-                padding: 20px;
-                text-align: center;
-                font-size: 14px;
-                color: #ccc;
-             ">
-                📄 Preview not available<br>
-                <span style="font-size:12px;opacity:0.8;">
-                    Please download to view
-                </span>
-            </div>`;
-            }
-
-            return `
-                <div class="preview-wrapper">
-                    <div class="preview-content">
-                    ${inner}
-                    </div>
-                </div>`;
-        }
-
-
-        function saveFile(fileName, fileData, sender) {
-
-            const byteString = atob(fileData.split(',')[1]);
-            const mimeString = fileData.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-
-            const blob = new Blob([ab], { type: mimeString });
-            const url = window.URL.createObjectURL(blob);
+        
+        function saveFile(fileName, fileData, sender, isBlob = false) {
 
             const link = document.createElement('a');
-            link.href = url;
+            link.href = fileData;
             link.download = fileName;
-
 
             document.body.appendChild(link);
             link.click();
 
             document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
 
-            addMessage(sender, `${translations[currentLanguage].file} : ${fileName} ${translations[currentLanguage].fileSaved}`, 'received');
+            if (isBlob) {
+                URL.revokeObjectURL(fileData);
+            }
+
+            addMessage(
+                sender,
+                `${translations[currentLanguage].file} : ${fileName} ${translations[currentLanguage].fileSaved}`,
+                'received'
+            );
+
             closeFileDialog(true, sender, fileName);
         }
+
 
         function closeFileDialog(saved, sender, fileName) {
             const modal = document.getElementById('fileModal');
@@ -2721,7 +2845,11 @@
             if (!saved) {
                 addMessage(sender, `${translations[currentLanguage].file} : ${fileName} ${translations[currentLanguage].fileNotSaved}`, 'received');
             }
+
+            isShowingFileDialog = false;
+            processFileQueue();
         }
+
 
         function addMessage(sender, content, type = 'received') {
             const container = document.getElementById('messagesContainer');
@@ -2906,50 +3034,116 @@
             ws.send(JSON.stringify({ type: 'enable_group' }));
         }
 
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        async function handleFileSelect(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
 
             if (!ws || ws.readyState !== WebSocket.OPEN) {
                 alert(translations[currentLanguage].notConnected);
                 return;
             }
 
-            if (file.size > 50 * 1024 * 1024) {
+            const receiver = currentMode === 'private' ? privateReceiver : 'GROUP';
+            const fileArray = Array.from(files);
+
+
+            for (let i = 0; i < fileArray.length; i++) {
+                const file = fileArray[i];
+
                 addMessage(
                     'System',
-                    `${translations[currentLanguage].largeFileSending}${file.name} (${formatFileSize(file.size)})${translations[currentLanguage].pleaseWait}`,
+                    `Sending ${file.name} (${formatFileSize(file.size)}) [${i + 1}/${fileArray.length}]`,
                     'system'
                 );
 
+                try {
+                    await sendFileInChunks(file, receiver);
+
+                    if (i < fileArray.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    }
+                } catch (error) {
+                    console.error(`Failed to send ${file.name}:`, error);
+                }
             }
 
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
-                const fileData = e.target.result;
-
-                const fileMessage = {
-                    type: 'file',
-                    fileName: file.name,
-                    fileData: fileData,
-                    fileSize: file.size,
-                    receiver: currentMode === 'private' ? privateReceiver : 'GROUP'
-                };
-
-                ws.send(JSON.stringify(fileMessage));
-                addMessage(translations[currentLanguage].you,
-                    `${translations[currentLanguage].fileSent}: ${file.name} (${formatFileSize(file.size)})`,
-                    'sent'
-                );
-            };
-
-            reader.onerror = (error) => {
-                alert(translations[currentLanguage].fileReadError);
-            };
-
-            reader.readAsDataURL(file);
             event.target.value = '';
+        }
+
+        async function sendFileInChunks(file, receiver) {
+            const CHUNK_SIZE = 256 * 1024; // 256KB chunks
+            const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+            transferCancelled = false;
+            showProgress(file.name, 'send');
+
+
+            ws.send(JSON.stringify({
+                type: 'file_chunk_start',
+                receiver: receiver,
+                fileName: file.name,
+                fileSize: file.size,
+                totalChunks: totalChunks
+            }));
+
+            const arrayBuffer = await file.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+
+            for (let i = 0; i < totalChunks; i++) {
+                if (transferCancelled) {
+                    ws.send(JSON.stringify({
+                        type: 'file_transfer_cancel',
+                        receiver: receiver
+                    }));
+                    hideProgress();
+                    addMessage('System', 'File transfer cancelled', 'system');
+                    return;
+                }
+
+                const start = i * CHUNK_SIZE;
+                const end = Math.min(start + CHUNK_SIZE, file.size);
+                const chunk = uint8Array.slice(start, end);
+
+                ws.send(JSON.stringify({
+                    type: 'file_chunk',
+                    receiver: receiver,
+                    chunkIndex: i,
+                    chunkData: Array.from(chunk)
+                }));
+
+                updateProgress(i + 1, totalChunks, 'send');
+
+
+                if (i % 10 === 0) {
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+
+            ws.send(JSON.stringify({
+                type: 'file_chunk_end',
+                receiver: receiver,
+                fileName: file.name
+            }));
+
+            addMessage(translations[currentLanguage].you,
+                `${translations[currentLanguage].fileSent}: ${file.name} (${formatFileSize(file.size)})`,
+                'sent'
+            );
+        }
+
+        function getMimeType(dataUrl) {
+            if (!dataUrl) return 'application/octet-stream';
+
+            if (dataUrl.startsWith('blob:')) {
+                return 'application/octet-stream';
+            }
+
+            const match = dataUrl.match(/^data:([^;]+);/);
+            if (match && match[1]) {
+                return match[1];
+            }
+
+            return 'application/octet-stream';
         }
 
         function formatFileSize(bytes) {
@@ -2959,6 +3153,120 @@
             if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
             return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
         }
+
+        function reconstructFile() {
+
+            for (let i = 0; i < totalChunksExpected; i++) {
+                if (!receivedChunks[i]) {
+                    addMessage('System', 'File transfer incomplete', 'system');
+                    hideProgress();
+                    return;
+                }
+            }
+
+            const buffers = receivedChunks.map(chunk => new Uint8Array(chunk));
+
+            const blob = new Blob(buffers);
+
+
+            const fileURL = URL.createObjectURL(blob);
+
+            showFileSaveDialog(
+                currentFileSender,
+                currentFileName,
+                fileURL,
+                currentFileSize,
+                true
+            );
+
+            hideProgress();
+
+            receivingFile = false;
+            receivedChunks = [];
+            totalChunksExpected = 0;
+            currentFileName = '';
+            currentFileSender = '';
+            currentFileSize = 0;
+        }
+
+        function processFileQueue() {
+
+            if (fileQueue.length === 0) return;
+
+            if (isShowingFileDialog) return;
+
+            isShowingFileDialog = true;
+
+            const fileInfo = fileQueue.shift();
+
+            for (let i = 0; i < fileInfo.totalChunks; i++) {
+                if (!fileInfo.chunks[i]) {
+                    addMessage('System', `File transfer incomplete: ${fileInfo.fileName}`, 'system');
+                    isShowingFileDialog = false;
+                    processFileQueue();
+                    return;
+                }
+            }
+
+            const buffers = fileInfo.chunks.map(chunk => new Uint8Array(chunk));
+            const mimeType = getMimeTypeFromFileName(fileInfo.fileName);
+            const blob = new Blob(buffers, { type: mimeType });
+            const fileURL = URL.createObjectURL(blob);
+
+            showFileSaveDialog(
+                fileInfo.sender,
+                fileInfo.fileName,
+                fileURL,
+                fileInfo.size,
+                true
+            );
+        }
+
+        function showProgress(fileName, type = 'send') {
+            const progressDiv = document.getElementById('fileProgress');
+            const fileNameEl = document.getElementById('progressFileName');
+            const t = translations[currentLanguage];
+
+            fileNameEl.textContent = type === 'send'
+                ? `Sending: ${fileName}`
+                : `Receiving: ${fileName}`;
+
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressPercent').textContent = '0%';
+            document.getElementById('progressInfo').textContent = '0 / 0 chunks';
+
+            progressDiv.style.display = 'block';
+        }
+
+        function updateProgress(current, total, type = 'send') {
+            const percent = Math.round((current / total) * 100);
+
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent + '%';
+            document.getElementById('progressInfo').textContent = `${current} / ${total} chunks`;
+
+            if (current >= total) {
+                setTimeout(() => {
+                    document.getElementById('fileProgress').style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        function hideProgress() {
+            document.getElementById('fileProgress').style.display = 'none';
+        }
+
+        function cancelFileTransfer() {
+            transferCancelled = true;
+
+            ws.send(JSON.stringify({
+                type: 'file_transfer_cancel',
+                receiver: currentMode === 'private' ? privateReceiver : 'GROUP'
+            }));
+
+            addMessage('System', 'File transfer cancelled', 'system');
+        }
+
 
         // WebRTC Functions
         async function initiateCall(targetUser, videoEnabled = false) {
@@ -2985,7 +3293,6 @@
 
             } catch (error) {
                 alert(translations[currentLanguage].micPermissionDenied || 'Microphone permission denied');
-                console.error('Error accessing microphone:', error);
             }
         }
 
@@ -3476,9 +3783,6 @@
         }, { passive: true });
 
 
-        function getMimeType(fileData) {
-            return fileData.split(',')[0].split(':')[1].split(';')[0];
-        }
 
         function isArchiveFile(mime, fileName) {
             return (
@@ -3492,18 +3796,28 @@
             );
         }
 
+        function getMimeTypeFromFileName(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
 
-        function decodeTextFromBase64(fileData) {
-            try {
-                return decodeURIComponent(
-                    escape(atob(fileData.split(',')[1]))
-                );
-            } catch {
-                return 'Unable to preview text file';
-            }
+            const map = {
+                png: 'image/png',
+                jpg: 'image/jpeg',
+                jpeg: 'image/jpeg',
+                gif: 'image/gif',
+                webp: 'image/webp',
+                mp4: 'video/mp4',
+                webm: 'video/webm',
+                mp3: 'audio/mpeg',
+                wav: 'audio/wav',
+                pdf: 'application/pdf'
+            };
+
+            return map[ext] || 'application/octet-stream';
         }
 
-        function isCodeFile(fileName, mime) {
+
+
+        function isCodeFile(fileName) {
             const codeExtensions = [
                 'js', 'ts', 'jsx', 'tsx',
                 'html', 'css',
@@ -3515,26 +3829,60 @@
             ];
 
             const ext = fileName.split('.').pop().toLowerCase();
-            return mime.startsWith('text/') || codeExtensions.includes(ext);
+            return codeExtensions.includes(ext);
         }
 
 
 
-        function openPreviewModal(fileData, fileName) {
-
-            if (fileData.length > 5_000_000) {
-                alert('File too large to preview');
-                return;
-            }
-
+        async function openPreviewModal(fileData, fileName, isBlob = false) {
             const modal = document.getElementById('previewModal');
             const content = document.getElementById('previewModalContent');
 
             if (!modal || !content) return;
 
-            document.body.classList.add('preview-open');
+            const mime = isBlob ? getMimeTypeFromFileName(fileName) : getMimeType(fileData);
 
-            content.innerHTML = renderFilePreview(fileData, fileName);
+            let inner = '';
+
+            if (mime.startsWith('image/')) {
+                inner = `<img src="${fileData}" alt="${fileName}" style="max-width:100%; height:auto;">`;
+            }
+            else if (mime.startsWith('video/')) {
+                inner = `<video controls playsinline style="max-width:100%;"><source src="${fileData}" type="${mime}"></video>`;
+            }
+            else if (mime.startsWith('audio/')) {
+                inner = `<audio controls style="width:100%;"><source src="${fileData}" type="${mime}"></audio>`;
+            }
+            else if (mime === 'application/pdf') {
+                inner = `
+                    <iframe 
+                        src="${fileData}" 
+                        width="100%" 
+                        height="75vh" 
+                        style="border:none;">
+                    </iframe>
+                    <div style="padding:10px;text-align:center;">
+                        <a href="${fileData}" download="${fileName}" 
+                        style="color:#22c55e;text-decoration:none;font-weight:500;">
+                        ⬇️ Download PDF
+                        </a>
+                    </div>
+    `;
+            }
+            else if (isCodeFile(fileName)) {
+                try {
+                    const response = await fetch(fileData);
+                    const text = await response.text();
+                    inner = `<pre style="white-space:pre;overflow-x:auto;font-family:monospace;font-size:13px;line-height:1.6;padding:12px;background:rgba(0,0,0,0.35);border-radius:10px;">${escapeHtml(text)}</pre>`;
+                } catch (e) {
+                    inner = `<div style="padding:20px;text-align:center;">Error loading file preview</div>`;
+                }
+            }
+            else {
+                inner = `<div style="padding:20px;text-align:center;">📄 Preview not available<br><span style="font-size:12px;opacity:0.8;">Please download to view</span></div>`;
+            }
+
+            content.innerHTML = `<div class="preview-wrapper"><div class="preview-content">${inner}</div></div>`;
             modal.style.display = 'flex';
         }
 
@@ -3590,16 +3938,6 @@
         function showInfoModal() {
             const t = translations[currentLanguage];
 
-            const infoModalTitle = document.getElementById('infoModalTitle');
-            if (infoModalTitle) {
-                infoModalTitle.textContent = t.infoModalTitle;
-            }
-
-            const infoModalBtn = document.getElementById('infoModalBtn');
-            if (infoModalBtn) {
-                infoModalBtn.textContent = t.gotIt;
-            }
-
             const content = currentLanguage === 'ta'
                 ? `
                     👋 <b>அரட்டையை தொடங்குவதற்கு முன் ஒரு சிறிய தகவல்…</b><br><br>
@@ -3608,7 +3946,7 @@
                     • அனைத்து பயனர்களும் ஆரம்பத்தில் <b>குழு அரட்டையில்</b> இணைக்கப்படுவார்கள்.<br>
                     • <b>தனிப்பட்ட செய்திகள் மஞ்சள் நிற பெட்டியில்</b> காண்பிக்கப்படும்.<br>
                     • <b>தனிப்பட்ட செய்தி அனுப்ப</b>, <b>உறுப்பினர்கள் → Chat</b> பொத்தானை அழுத்தவும்.<br>
-                    • <b>ஒருவருக்கு ஒருவர் அழைப்பு</b> வசதி உள்ளது (ஒரே நாட்டுக்குள் மட்டும்). 🌍<br><br>
+                    • <b>ஒருவருக்கு ஒருவர் அழைப்பு</b> வசதி உள்ளது (ஒரே நெட்வொர்க்கிற்குள் மட்டும்). 🌍<br><br>
                     😊 மகிழ்ச்சியாக பேசுங்கள்!
                 `
                 : `
@@ -3618,19 +3956,19 @@
                     • All users are <b>initially connected to Group chat</b>.<br>
                     • <b>Private messages appear in a yellow bubble</b>.<br>
                     • To send a <b>private message</b>, click <b>Users → Chat</b>.<br>
-                    • <b>One-to-one calls are available</b> (within the same country only). 🌍<br><br>
+                    • <b>One-to-one calls are available</b> (within the same network only). 🌍<br><br>
                     😊 Enjoy chatting!
                 `;
 
             document.getElementById('infoModalContent').innerHTML = content;
             document.getElementById('infoModal').style.display = 'flex';
+            document.getElementById('infoModalTitle').textContent = t.infoModalTitle;
+            document.getElementById('infoModalBtn').textContent = t.gotIt;
         }
 
         function closeInfoModal() {
             document.getElementById('infoModal').style.display = 'none';
         }
-
-
     </script>
 
 </body>
