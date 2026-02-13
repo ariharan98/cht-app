@@ -2729,7 +2729,7 @@
                 case 'call_timeout':
                     if (!currentCallUser) break;
                     addMessage('System',
-                        translations[currentLanguage].callTimedOut ,
+                        translations[currentLanguage].callTimedOut,
                         'system'
                     );
                     cleanupCall();
@@ -2752,10 +2752,17 @@
 
                     showProgress(data.fileName, 'receive');
 
-                    addMessage('System',
-                        `${t.receivingFileFrom} ${data.fileName} ${t.from} ${data.sender} (${formatFileSize(data.fileSize)})...`,
-                        'system'
-                    );
+                    if (currentLanguage === 'ta') {
+                        addMessage('System',
+                            `${data.sender} அவர்களிடமிருந்து ${data.fileName} ${t.receiving} (${formatFileSize(data.fileSize)})...`,
+                            'system'
+                        );
+                    } else {
+                        addMessage('System',
+                            `${t.receivingFileFrom} ${data.fileName} ${t.from} ${data.sender} (${formatFileSize(data.fileSize)})...`,
+                            'system'
+                        );
+                    }
                     break;
 
                 case 'file_chunk':
@@ -3015,7 +3022,7 @@
                     callBtn.className = 'btn-call';
 
                     if (user.callState !== 'idle') {
-                        callBtn.textContent = t.inCall  
+                        callBtn.textContent = t.inCall
                         callBtn.disabled = true;
                         callBtn.style.opacity = '0.6';
                         callBtn.style.cursor = 'not-allowed';
