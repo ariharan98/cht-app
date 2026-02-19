@@ -3414,9 +3414,9 @@
 
                 case 'file_chunk':
                     if (receivingFile) {
-                        const binary = atob(data.chunkData);
-                        const bytes = new Uint8Array(binary.length);
-                        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                        const bin = atob(data.chunkData);
+                        const bytes = new Uint8Array(bin.length);
+                        for (let j = 0; j < bin.length; j++) bytes[j] = bin.charCodeAt(j);
                         receivedChunks[data.chunkIndex] = bytes;
 
                         const received = receivedChunks.filter(c => c).length;
@@ -3797,7 +3797,7 @@
         }
 
         async function sendFileInChunks(file, receiver) {
-            const CHUNK_SIZE = 512 * 1024; // 512KB chunks
+            const CHUNK_SIZE = 64 * 1024; // 64KB chunks
             const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
             transferCancelled = false;
@@ -3834,11 +3834,15 @@
                     type: 'file_chunk',
                     receiver: receiver,
                     chunkIndex: i,
-                    chunkData: btoa(String.fromCharCode(...chunk))
+                    chunkData: uint8ToBase64(chunk)
                 }));
 
                 updateProgress(i + 1, totalChunks, 'send');
 
+
+                if (i % 10 === 0) {
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
             }
 
             ws.send(JSON.stringify({
@@ -3851,6 +3855,15 @@
                 `${translations[currentLanguage].fileSent}: ${file.name} (${formatFileSize(file.size)})`,
                 'sent'
             );
+        }
+
+        function uint8ToBase64(uint8Array) {
+            let binary = '';
+            const len = uint8Array.length;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(uint8Array[i]);
+            }
+            return btoa(binary);
         }
 
         function getMimeType(dataUrl) {
@@ -3930,7 +3943,7 @@
                 }
             }
 
-            const buffers = fileInfo.chunks; 
+            const buffers = fileInfo.chunks;
             const mimeType = getMimeTypeFromFileName(fileInfo.fileName);
             const blob = new Blob(buffers, { type: mimeType });
             const fileURL = URL.createObjectURL(blob);
