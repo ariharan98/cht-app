@@ -545,7 +545,7 @@
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 15px 15px 20px; 
+            padding: 15px 15px 15px 20px;
             margin-bottom: 10px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
@@ -1740,7 +1740,7 @@
             .user-actions {
                 width: 100%;
                 margin-top: 8px;
-                justify-content:end;
+                justify-content: end;
             }
 
             .btn-chat,
@@ -3414,7 +3414,10 @@
 
                 case 'file_chunk':
                     if (receivingFile) {
-                        receivedChunks[data.chunkIndex] = data.chunkData;
+                        const binary = atob(data.chunkData);
+                        const bytes = new Uint8Array(binary.length);
+                        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                        receivedChunks[data.chunkIndex] = bytes;
 
                         const received = receivedChunks.filter(c => c).length;
                         updateProgress(received, totalChunksExpected, 'receive');
@@ -3794,7 +3797,7 @@
         }
 
         async function sendFileInChunks(file, receiver) {
-            const CHUNK_SIZE = 256 * 1024; // 256KB chunks
+            const CHUNK_SIZE = 512 * 1024; // 512KB chunks
             const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
             transferCancelled = false;
@@ -3831,15 +3834,11 @@
                     type: 'file_chunk',
                     receiver: receiver,
                     chunkIndex: i,
-                    chunkData: Array.from(chunk)
+                    chunkData: btoa(String.fromCharCode(...chunk))
                 }));
 
                 updateProgress(i + 1, totalChunks, 'send');
 
-
-                if (i % 10 === 0) {
-                    await new Promise(resolve => setTimeout(resolve, 0));
-                }
             }
 
             ws.send(JSON.stringify({
@@ -3931,7 +3930,7 @@
                 }
             }
 
-            const buffers = fileInfo.chunks.map(chunk => new Uint8Array(chunk));
+            const buffers = fileInfo.chunks; 
             const mimeType = getMimeTypeFromFileName(fileInfo.fileName);
             const blob = new Blob(buffers, { type: mimeType });
             const fileURL = URL.createObjectURL(blob);
