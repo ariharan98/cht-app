@@ -3783,7 +3783,8 @@
                 );
 
                 try {
-                    await sendFileInChunks(file, receiver);
+                    const cancelled = await sendFileInChunks(file, receiver);
+                    if (cancelled) break;
 
                     if (i < fileArray.length - 1) {
                         await new Promise(resolve => setTimeout(resolve, 300));
@@ -3823,7 +3824,7 @@
                     }));
                     hideProgress();
                     addMessage('System', translations[currentLanguage].fileTransferCancelled, 'system');
-                    return;
+                    return true;
                 }
 
                 const start = i * CHUNK_SIZE;
@@ -3840,9 +3841,7 @@
                 updateProgress(i + 1, totalChunks, 'send');
 
 
-                if (i % 10 === 0) {
-                    await new Promise(resolve => setTimeout(resolve, 0));
-                }
+                await new Promise(resolve => setTimeout(resolve, 1));
             }
 
             ws.send(JSON.stringify({
@@ -3855,6 +3854,7 @@
                 `${translations[currentLanguage].fileSent}: ${file.name} (${formatFileSize(file.size)})`,
                 'sent'
             );
+            return false;
         }
 
         function uint8ToBase64(uint8Array) {
@@ -3993,12 +3993,8 @@
         }
 
         function cancelFileTransfer() {
+            if (transferCancelled) return;
             transferCancelled = true;
-
-            ws.send(JSON.stringify({
-                type: 'file_transfer_cancel',
-                receiver: currentMode === 'private' ? privateReceiver : 'GROUP'
-            }));
 
             addMessage('System', translations[currentLanguage].fileTransferCancelled, 'system');
         }
