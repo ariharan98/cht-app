@@ -3994,26 +3994,6 @@
         function cancelFileTransfer() {
             if (transferCancelled) return;
             transferCancelled = true;
-
-            if (receivingFile) {
-                ws.send(JSON.stringify({
-                    type: 'file_transfer_cancel',
-                    receiver: currentMode === 'private' ? privateReceiver : 'GROUP',
-                    cancelledBy: 'receiver',
-                    sender: currentFileSender
-                }));
-
-                receivingFile = false;
-                receivedChunks = [];
-                totalChunksExpected = 0;
-                currentFileName = '';
-                currentFileSender = '';
-                currentFileSize = 0;
-
-                hideProgress();
-                addMessage('System', translations[currentLanguage].fileTransferCancelled, 'system');
-            }
-
         }
 
 
