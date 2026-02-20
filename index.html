@@ -3450,34 +3450,15 @@
                     break;
 
                 case 'file_transfer_cancel':
+                    receivingFile = false;
+                    receivedChunks = [];
+                    totalChunksExpected = 0;
+                    currentFileName = '';
+                    currentFileSender = '';
+                    currentFileSize = 0;
+
                     hideProgress();
-
-                    if (data.cancelledBy === 'sender') {
-
-                        receivingFile = false;
-                        receivedChunks = [];
-                        totalChunksExpected = 0;
-                        currentFileName = '';
-                        currentFileSender = '';
-                        currentFileSize = 0;
-
-                        addMessage(
-                            'System',
-                            translations[currentLanguage].fileTransferCancelledBySender,
-                            'system'
-                        );
-                    }
-
-                    else if (data.cancelledBy === 'receiver') {
-
-                        transferCancelled = true;
-
-                        addMessage(
-                            'System',
-                            translations[currentLanguage].fileTransferCancelled,
-                            'system'
-                        );
-                    }
+                    addMessage('System', translations[currentLanguage].fileTransferCancelledBySender, 'system');
                     break;
                 case 'admin_user_list':
                     allAdminUsers = data.users || [];
@@ -3839,9 +3820,7 @@
                 if (transferCancelled) {
                     ws.send(JSON.stringify({
                         type: 'file_transfer_cancel',
-                        receiver: receiver,
-                        cancelledBy: 'sender',
-                        fileName: file.name
+                        receiver: receiver
                     }));
                     hideProgress();
                     return true;
@@ -4032,6 +4011,7 @@
                 currentFileSize = 0;
 
                 hideProgress();
+                addMessage('System', translations[currentLanguage].fileTransferCancelled, 'system');
             }
 
         }
