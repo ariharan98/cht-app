@@ -2887,7 +2887,9 @@
         <div class="progress-header">
             <span id="progressFileName">Sending file...</span>
             <div style="display:flex; gap:6px;">
-                <button class="progress-cancel" onclick="cancelFileTransfer()">✕</button>
+                <button class="progress-cancel" onclick="receivingFile ? cancelReceivingFile() : cancelFileTransfer()">
+                    ✕
+                </button>
                 <button class="progress-close" onclick="hideProgress()">—</button>
             </div>
         </div>
@@ -3083,6 +3085,7 @@
                 from: 'from',
                 fileTransferCancelled: 'File transfer cancelled',
                 fileTransferCancelledBySender: 'File transfer cancelled by sender',
+                fileTransferCancelledByReciver: 'File transfer cancelled by you',
                 fileTransferIncomplete: 'File transfer incomplete',
                 sending: 'Sending',
                 receiving: 'Receiving',
@@ -3168,6 +3171,7 @@
                 from: 'இருந்து',
                 fileTransferCancelled: 'கோப்பு அனுப்புதல் ரத்து செய்யப்பட்டது',
                 fileTransferCancelledBySender: 'அனுப்புநர் கோப்பு அனுப்புதலை ரத்து செய்தார்',
+                fileTransferCancelledByReciver: 'நீங்கள் கோப்பு பெறுதலை ரத்து செய்துள்ளீர்கள்',
                 fileTransferIncomplete: 'கோப்பு அனுப்புதல் முழுமையடையவில்லை',
                 sending: 'அனுப்பப்படுகிறது',
                 receiving: 'பெறப்படுகிறது',
@@ -3450,6 +3454,7 @@
                     break;
 
                 case 'file_transfer_cancel':
+                    transferCancelled = true;
                     receivingFile = false;
                     receivedChunks = [];
                     totalChunksExpected = 0;
@@ -3546,6 +3551,31 @@
 
             isShowingFileDialog = false;
             processFileQueue();
+        }
+
+
+        function cancelReceivingFile() {
+            if (!receivingFile || !currentFileSender) return;
+
+            ws.send(JSON.stringify({
+                type: 'file_transfer_cancel',
+                to: currentFileSender,
+                from: username
+            }));
+
+            receivingFile = false;
+            receivedChunks = [];
+            totalChunksExpected = 0;
+            currentFileName = '';
+            currentFileSender = '';
+            currentFileSize = 0;
+
+            hideProgress();
+
+            addMessage('System',
+                translations[currentLanguage].fileTransferCancelledByReciver,
+                'system'
+            );
         }
 
 
