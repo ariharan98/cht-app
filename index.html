@@ -3823,7 +3823,6 @@
                         receiver: receiver
                     }));
                     hideProgress();
-                    addMessage('System', translations[currentLanguage].fileTransferCancelled, 'system');
                     return true;
                 }
 
@@ -3995,8 +3994,6 @@
         function cancelFileTransfer() {
             if (transferCancelled) return;
             transferCancelled = true;
-
-            addMessage('System', translations[currentLanguage].fileTransferCancelled, 'system');
         }
 
 
