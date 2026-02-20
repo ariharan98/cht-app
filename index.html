@@ -3450,15 +3450,34 @@
                     break;
 
                 case 'file_transfer_cancel':
-                    receivingFile = false;
-                    receivedChunks = [];
-                    totalChunksExpected = 0;
-                    currentFileName = '';
-                    currentFileSender = '';
-                    currentFileSize = 0;
-
                     hideProgress();
-                    addMessage('System', translations[currentLanguage].fileTransferCancelledBySender, 'system');
+
+                    if (data.cancelledBy === 'sender') {
+
+                        receivingFile = false;
+                        receivedChunks = [];
+                        totalChunksExpected = 0;
+                        currentFileName = '';
+                        currentFileSender = '';
+                        currentFileSize = 0;
+
+                        addMessage(
+                            'System',
+                            translations[currentLanguage].fileTransferCancelledBySender,
+                            'system'
+                        );
+                    }
+
+                    else if (data.cancelledBy === 'receiver') {
+
+                        transferCancelled = true;
+
+                        addMessage(
+                            'System',
+                            translations[currentLanguage].fileTransferCancelled,
+                            'system'
+                        );
+                    }
                     break;
                 case 'admin_user_list':
                     allAdminUsers = data.users || [];
@@ -3820,7 +3839,9 @@
                 if (transferCancelled) {
                     ws.send(JSON.stringify({
                         type: 'file_transfer_cancel',
-                        receiver: receiver
+                        receiver: receiver,
+                        cancelledBy: 'sender',
+                        fileName: file.name
                     }));
                     hideProgress();
                     return true;
@@ -3994,6 +4015,25 @@
         function cancelFileTransfer() {
             if (transferCancelled) return;
             transferCancelled = true;
+
+            if (receivingFile) {
+                ws.send(JSON.stringify({
+                    type: 'file_transfer_cancel',
+                    receiver: currentMode === 'private' ? privateReceiver : 'GROUP',
+                    cancelledBy: 'receiver',
+                    sender: currentFileSender
+                }));
+
+                receivingFile = false;
+                receivedChunks = [];
+                totalChunksExpected = 0;
+                currentFileName = '';
+                currentFileSender = '';
+                currentFileSize = 0;
+
+                hideProgress();
+            }
+
         }
 
 
