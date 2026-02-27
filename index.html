@@ -1487,6 +1487,107 @@
             transition: all 0.25s;
         }
 
+        .btn-toggle-call {
+            padding: 6px 14px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1.5px solid rgba(239, 68, 68, 0.35);
+            border-radius: 8px;
+            color: #ef4444;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .btn-toggle-call:hover {
+            background: rgba(239, 68, 68, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-toggle-call.disabled {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1.5px solid rgba(34, 197, 94, 0.35);
+            color: #22c55e;
+        }
+
+        .btn-toggle-call.disabled:hover {
+            background: rgba(34, 197, 94, 0.25);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        body.light-theme .btn-toggle-call {
+            background: rgba(220, 38, 38, 0.08);
+            border-color: rgba(220, 38, 38, 0.25);
+            color: #dc2626;
+        }
+
+        body.light-theme .btn-toggle-call:hover {
+            background: rgba(220, 38, 38, 0.15);
+        }
+
+        body.light-theme .btn-toggle-call.disabled {
+            background: rgba(22, 163, 74, 0.08);
+            border-color: rgba(22, 163, 74, 0.25);
+            color: #16a34a;
+        }
+
+        body.light-theme .btn-toggle-call.disabled:hover {
+            background: rgba(22, 163, 74, 0.15);
+        }
+
+
+        .btn-call-control {
+            padding: 9px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1.5px solid;
+        }
+
+        .btn-call-control.disable {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.35);
+            color: #ef4444;
+        }
+
+        .btn-call-control.disable:hover {
+            background: rgba(239, 68, 68, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-call-control.enable {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: rgba(34, 197, 94, 0.35);
+            color: #22c55e;
+        }
+
+        .btn-call-control.enable:hover {
+            background: rgba(34, 197, 94, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(34, 197, 94, 0.3);
+        }
+
+        body.light-theme .btn-call-control.disable {
+            background: rgba(220, 38, 38, 0.08);
+            border-color: rgba(220, 38, 38, 0.25);
+            color: #dc2626;
+        }
+
+        body.light-theme .btn-call-control.enable {
+            background: rgba(22, 163, 74, 0.08);
+            border-color: rgba(22, 163, 74, 0.25);
+            color: #16a34a;
+        }
+
         body.light-theme .admin-header-sub {
             color: #64748b;
         }
@@ -3192,6 +3293,9 @@
                 <div class="admin-header-sub">Arattai — User Management</div>
             </div>
             <div class="admin-actions">
+                <button class="btn-call-control disable" onclick="adminDisableCallGlobal()">🔇 Disable All
+                    Calls</button>
+                <button class="btn-call-control enable" onclick="adminEnableCallGlobal()">🔊 Enable All Calls</button>
                 <button class="btn-refresh" onclick="adminRefresh()">🔄 Refresh</button>
                 <button class="btn-danger" onclick="adminDeleteAllInactive()">🗑️ Delete All Inactive</button>
                 <button class="btn-secondary" onclick="toggleTheme()" style="padding:9px 16px;">🎨 Theme</button>
@@ -3238,6 +3342,7 @@
                             <th>IP Address</th>
                             <th>Location</th>
                             <th>Last Seen</th>
+                            <th>Call Access</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -3268,13 +3373,6 @@
         let currentFileName = '';
         let currentFileSender = '';
         let currentFileSize = 0;
-
-        const textarea = document.getElementById('messageInput');
-        const remoteVideo = document.getElementById('remoteVideo');
-        const localVideo = document.getElementById('localVideo');
-        const remoteAudio = document.getElementById('remoteAudio');
-
-
         let peerConnection = null;
         let localStream = null;
         let callTimer = null;
@@ -3293,6 +3391,9 @@
         let fileQueue = [];
         let isShowingFileDialog = false;
         let adminDisconnectTimer = null;
+        let callDisabledForMe = false;
+        let privateChatWindows = {};
+        let activeChatWindow = 'group';
 
         const translations = {
             en: {
@@ -3378,7 +3479,9 @@
                 noAudioOutput: 'No audio output devices found',
                 connectionFailed: 'Failed to connect',
                 chunks: 'chunks',
-                callTimedOut: 'Call timed out'
+                callTimedOut: 'Call timed out',
+                callsDisabled: 'Calls are currently disabled',
+                callDisabledByAdmin: 'Call feature has been disabled by admin'
 
             },
             ta: {
@@ -3465,9 +3568,16 @@
                 connectionFailed: 'இணைப்பு தோல்வியடைந்தது',
                 chunks: 'துண்டுகள்',
                 callTimedOut: 'அழைப்பு நேரம் முடிந்தது',
+                callsDisabled: 'அழைப்புகள் தற்போது முடக்கப்பட்டுள்ளன',
+                callDisabledByAdmin: 'நிர்வாகி அழைப்பு அம்சத்தை முடக்கியுள்ளார்'
             }
 
         };
+
+        const textarea = document.getElementById('messageInput');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const localVideo = document.getElementById('localVideo');
+        const remoteAudio = document.getElementById('remoteAudio');
 
         const configuration = {
             iceServers: [
@@ -3513,7 +3623,7 @@
                     const t = translations[currentLanguage];
                     addMessage('System', t.disconnected, 'system');
                     document.getElementById('statusText').textContent = t.disconnected;
-                    if (peerConnection) endCall();
+                    if (peerConnection) cleanupCall();
                     location.reload();
                 };
 
@@ -3574,6 +3684,7 @@
                         return;
                     }
                     myCountryCode = data.country || null;
+                    callDisabledForMe = data.callDisabled || false;
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('chatScreen').style.display = 'flex';
                     document.getElementById('statusText').textContent = fullName + ' (' + username + ')' + ' • ' + t.groupChat;
@@ -3743,12 +3854,23 @@
                     hideProgress();
                     addMessage('System', translations[currentLanguage].fileTransferCancelledBySender, 'system');
                     break;
+                case 'call_disabled':
+                    addMessage('System', translations[currentLanguage].callsDisabled, 'system');
+                    break;
+
+                case 'call_permission_changed':
+                case 'call_permission_changed':
+                    callDisabledForMe = data.callDisabled;
+                    if (data.callDisabled) {
+                        addMessage('System', translations[currentLanguage].callDisabledByAdmin, 'system');
+                    }
+                    ws.send(JSON.stringify({ type: 'list_users' }));
+                    break;
+
                 case 'admin_user_list':
                     allAdminUsers = data.users || [];
                     renderAdminTable(allAdminUsers);
                     break;
-
-
             }
         }
 
@@ -4011,11 +4133,18 @@
                     const callBtn = document.createElement('button');
                     callBtn.className = 'btn-call';
 
-                    if (user.callState !== 'idle') {
-                        callBtn.textContent = t.inCall
+                    if (callDisabledForMe || user.callDisabled || user.callState !== 'idle') {
+                        if (user.callState !== 'idle') {
+                            callBtn.textContent = t.inCall;
+                        } else {
+                            callBtn.innerHTML = '📞 ' + (t.callBtn || 'Call');
+                        }
                         callBtn.disabled = true;
-                        callBtn.style.opacity = '0.6';
+                        callBtn.style.opacity = '0.5';
                         callBtn.style.cursor = 'not-allowed';
+                        if (callDisabledForMe || user.callDisabled) {
+                            callBtn.title = t.callsDisabled || 'Calls disabled';
+                        }
                     } else {
                         callBtn.innerHTML = '📞 ' + (t.callBtn || 'Call');
                         callBtn.onclick = () => {
@@ -4028,11 +4157,14 @@
                     const videoCallBtn = document.createElement('button');
                     videoCallBtn.className = 'btn-call btn-video-call';
 
-                    if (user.callState !== 'idle') {
+                    if (callDisabledForMe || user.callDisabled || user.callState !== 'idle') {
                         videoCallBtn.textContent = '📹';
                         videoCallBtn.disabled = true;
-                        videoCallBtn.style.opacity = '0.6';
+                        videoCallBtn.style.opacity = '0.5';
                         videoCallBtn.style.cursor = 'not-allowed';
+                        if (callDisabledForMe || user.callDisabled) {
+                            videoCallBtn.title = t.callsDisabled || 'Calls disabled';
+                        }
                     } else {
                         videoCallBtn.innerHTML = '📹';
                         videoCallBtn.onclick = () => {
@@ -4270,8 +4402,13 @@
         }
 
 
-        // WebRTC Functions
         async function initiateCall(targetUser, videoEnabled = false) {
+
+            if (callDisabledForMe) {
+                alert(translations[currentLanguage].callsDisabled || 'Calls are currently disabled');
+                return;
+            }
+
 
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({
@@ -4994,7 +5131,7 @@
 
 
             if (!users.length) {
-                tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No users found</td></tr>';
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No users found</td></tr>';
                 return;
             }
 
@@ -5019,31 +5156,37 @@
                     : '—';
 
                 tr.innerHTML = `
-            <td data-label="#">${i + 1}</td>
-            <td data-label="User">
-                <div class="user-badge">
-                    <div class="avatar-sm">${(u.fullName || u.userName || '?')[0].toUpperCase()}</div>
-                    <div class="user-name-cell">
-                        <strong>${escapeHtml(u.fullName || '—')}</strong>
-                        <span>${escapeHtml(u.userName || '—')}</span>
-                    </div>
-                </div>
-            </td>
-            <td data-label="Username" style="font-weight:600;color:#ccc;">@${escapeHtml(u.userName || '—')}</td>
-            <td data-label="Status">
-                <span class="status-badge ${u.status === 'active' ? 'active' : 'inactive'}">
-                    ${u.status === 'active' ? 'Active' : 'Inactive'}
-                </span>
-            </td>
-            <td data-label="IP" class="ip-cell">${escapeHtml(u.ipAddress || '—')}</td>
-            <td data-label="Location" class="loc-cell">${escapeHtml(loc || '—')}</td>
-            <td data-label="Last Seen" style="font-size:11px;color:#888;">${escapeHtml(lastSeen)}</td>
-            <td data-label="Action">
-                <button class="btn-del" onclick="adminDeleteUser('${escapeHtml(u.userName)}')">🗑️ Delete</button>
-            </td>
-        `;
+    <td data-label="#">${i + 1}</td>
+    <td data-label="User">
+        <div class="user-badge">
+            <div class="avatar-sm">${(u.fullName || u.userName || '?')[0].toUpperCase()}</div>
+            <div class="user-name-cell">
+                <strong>${escapeHtml(u.fullName || '—')}</strong>
+                <span>${escapeHtml(u.userName || '—')}</span>
+            </div>
+        </div>
+    </td>
+    <td data-label="Username" style="font-weight:600;color:#ccc;">@${escapeHtml(u.userName || '—')}</td>
+    <td data-label="Status">
+        <span class="status-badge ${u.status === 'active' ? 'active' : 'inactive'}">
+            ${u.status === 'active' ? 'Active' : 'Inactive'}
+        </span>
+    </td>
+    <td data-label="IP" class="ip-cell">${escapeHtml(u.ipAddress || '—')}</td>
+    <td data-label="Location" class="loc-cell">${escapeHtml(loc || '—')}</td>
+    <td data-label="Last Seen" style="font-size:11px;color:#888;">${escapeHtml(lastSeen)}</td>
+    <td data-label="Call Access">
+        <button class="btn-toggle-call ${u.callDisabled ? 'disabled' : ''}" onclick="adminToggleUserCall('${u.userName}', ${u.callDisabled})">
+            ${u.callDisabled ? '🔊 Enable' : '🔇 Disable'}
+        </button>
+    </td>
+    <td data-label="Action">
+        <button class="btn-del" onclick="adminDeleteUser('${escapeHtml(u.userName)}')">🗑️ Delete</button>
+    </td>
+`;
                 tbody.appendChild(tr);
             });
+
         }
         function filterAdminTable(query) {
             if (!query) { renderAdminTable(allAdminUsers); return; }
@@ -5077,6 +5220,31 @@
             if (!confirm('Delete ALL inactive users? This cannot be undone.')) return;
             if (ws?.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: 'admin_delete_inactive' }));
+            }
+        }
+
+
+        function adminToggleUserCall(targetUser, enable) {
+            if (!confirm(`${enable ? 'Enable' : 'Disable'} calls for "${targetUser}"?`)) return;
+            if (ws?.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: enable ? 'admin_enable_call_user' : 'admin_disable_call_user',
+                    target: targetUser
+                }));
+            }
+        }
+
+        function adminDisableCallGlobal() {
+            if (!confirm('Disable calls for ALL users? This will affect everyone.')) return;
+            if (ws?.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'admin_disable_call_global' }));
+            }
+        }
+
+        function adminEnableCallGlobal() {
+            if (!confirm('Enable calls for all users?')) return;
+            if (ws?.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'admin_enable_call_global' }));
             }
         }
     </script>
