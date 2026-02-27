@@ -3481,7 +3481,8 @@
                 chunks: 'chunks',
                 callTimedOut: 'Call timed out',
                 callsDisabled: 'Calls are currently disabled',
-                callDisabledByAdmin: 'Call feature has been disabled by admin'
+                callDisabledByAdmin: 'Call feature has been disabled by admin',
+                callEnabledByAdmin: 'Call feature has been enabled by admin'
 
             },
             ta: {
@@ -3569,7 +3570,8 @@
                 chunks: 'துண்டுகள்',
                 callTimedOut: 'அழைப்பு நேரம் முடிந்தது',
                 callsDisabled: 'அழைப்புகள் தற்போது முடக்கப்பட்டுள்ளன',
-                callDisabledByAdmin: 'நிர்வாகி அழைப்பு அம்சத்தை முடக்கியுள்ளார்'
+                callDisabledByAdmin: 'நிர்வாகி அழைப்பு அம்சத்தை முடக்கியுள்ளார்',
+                callEnabledByAdmin: 'நிர்வாகி அழைப்பு அம்சத்தை இயக்கியுள்ளார்'
             }
 
         };
@@ -3859,10 +3861,11 @@
                     break;
 
                 case 'call_permission_changed':
-                case 'call_permission_changed':
                     callDisabledForMe = data.callDisabled;
                     if (data.callDisabled) {
                         addMessage('System', translations[currentLanguage].callDisabledByAdmin, 'system');
+                    } else {
+                        addMessage('System', translations[currentLanguage].callEnabledByAdmin, 'system');
                     }
                     ws.send(JSON.stringify({ type: 'list_users' }));
                     break;
