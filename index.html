@@ -1060,73 +1060,6 @@
             background: rgba(255, 255, 255, 0.25);
         }
 
-        .btn-toggle-call {
-            padding: 6px 14px;
-            background: rgba(34, 197, 94, 0.15);
-            border: 1.5px solid rgba(34, 197, 94, 0.35);
-            border-radius: 8px;
-            color: #22c55e;
-            font-size: 12px;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-
-        .btn-toggle-call:hover {
-            background: rgba(34, 197, 94, 0.25);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-        }
-
-        .btn-toggle-call.disabled {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: rgba(239, 68, 68, 0.35);
-            color: #ef4444;
-        }
-
-        .btn-toggle-call.disabled:hover {
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-        }
-
-
-        .btn-call-control {
-            padding: 9px 18px;
-            border: 1.5px solid;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.25s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-call-control.disable {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: rgba(239, 68, 68, 0.35);
-            color: #ef4444;
-        }
-
-        .btn-call-control.disable:hover {
-            background: rgba(239, 68, 68, 0.25);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(239, 68, 68, 0.3);
-        }
-
-        .btn-call-control.enable {
-            background: rgba(34, 197, 94, 0.15);
-            border-color: rgba(34, 197, 94, 0.35);
-            color: #22c55e;
-        }
-
-        .btn-call-control.enable:hover {
-            background: rgba(34, 197, 94, 0.25);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(34, 197, 94, 0.3);
-        }
 
 
 
@@ -1424,6 +1357,8 @@
             scrollbar-color: rgba(102, 126, 234, 0.45) transparent;
         }
 
+        /* Add these inside body.light-theme { } section */
+
         body.light-theme .btn-call {
             background: rgba(34, 197, 94, 0.1);
             border-color: #22c55e;
@@ -1514,61 +1449,6 @@
 
         body.light-theme .progress-bar {
             background: linear-gradient(45deg, #667eea, #764ba2);
-        }
-
-        body.light-theme .btn-call-control.disable {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #dc2626;
-        }
-
-        body.light-theme .btn-toggle-call {
-            background: rgba(34, 197, 94, 0.1);
-            border-color: rgba(34, 197, 94, 0.3);
-            color: #16a34a;
-        }
-
-        body.light-theme .btn-toggle-call:hover {
-            background: rgba(34, 197, 94, 0.2);
-        }
-
-        body.light-theme .btn-toggle-call.disabled {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #dc2626;
-        }
-
-        body.light-theme .btn-call-control.enable {
-            background: rgba(34, 197, 94, 0.1);
-            border-color: rgba(34, 197, 94, 0.3);
-            color: #16a34a;
-        }
-
-        body.light-theme .private-chat-indicator {
-            background: rgba(251, 191, 36, 0.1);
-            color: #d97706;
-        }
-
-
-        .chat-window {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .chat-window.active {
-            display: flex;
-        }
-
-        .private-chat-indicator {
-            background: rgba(251, 191, 36, 0.15);
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            padding: 8px 16px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 13px;
-            color: #fbbf24;
         }
 
         .language-toggle {
@@ -2593,27 +2473,6 @@
                 padding: 24px;
                 font-size: 12px;
             }
-
-            .btn-toggle-call {
-                padding: 5px 11px;
-                font-size: 11px;
-                border-radius: 6px;
-            }
-
-            .btn-call-control {
-                padding: 7px 10px;
-                font-size: 11px;
-                border-radius: 8px;
-                white-space: nowrap;
-                flex-shrink: 0;
-                gap: 4px;
-            }
-
-            .private-chat-indicator {
-                padding: 6px 12px;
-                font-size: 11px;
-                margin-bottom: 10px;
-            }
         }
 
         @media (hover: hover) and (pointer: fine) {
@@ -3204,9 +3063,7 @@
 
         </div>
 
-        <div class="messages-container" id="messagesContainer">
-            <div class="chat-window active" id="groupChatWindow"></div>
-        </div>
+        <div class="messages-container" id="messagesContainer"></div>
 
         <div class="input-container">
             <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileSelect(event)">
@@ -3335,9 +3192,6 @@
                 <div class="admin-header-sub">Arattai — User Management</div>
             </div>
             <div class="admin-actions">
-                <button class="btn-call-control disable" onclick="adminDisableCallGlobal()">🔇 Disable All
-                    Calls</button>
-                <button class="btn-call-control enable" onclick="adminEnableCallGlobal()">🔊 Enable All Calls</button>
                 <button class="btn-refresh" onclick="adminRefresh()">🔄 Refresh</button>
                 <button class="btn-danger" onclick="adminDeleteAllInactive()">🗑️ Delete All Inactive</button>
                 <button class="btn-secondary" onclick="toggleTheme()" style="padding:9px 16px;">🎨 Theme</button>
@@ -3384,7 +3238,6 @@
                             <th>IP Address</th>
                             <th>Location</th>
                             <th>Last Seen</th>
-                            <th>Call Access</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -3415,6 +3268,13 @@
         let currentFileName = '';
         let currentFileSender = '';
         let currentFileSize = 0;
+
+        const textarea = document.getElementById('messageInput');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const localVideo = document.getElementById('localVideo');
+        const remoteAudio = document.getElementById('remoteAudio');
+
+
         let peerConnection = null;
         let localStream = null;
         let callTimer = null;
@@ -3433,9 +3293,6 @@
         let fileQueue = [];
         let isShowingFileDialog = false;
         let adminDisconnectTimer = null;
-        let callDisabledForMe = false;
-        let privateChatWindows = {};
-        let activeChatWindow = 'group';
 
         const translations = {
             en: {
@@ -3521,10 +3378,7 @@
                 noAudioOutput: 'No audio output devices found',
                 connectionFailed: 'Failed to connect',
                 chunks: 'chunks',
-                callTimedOut: 'Call timed out',
-                callsDisabled: 'Calls are currently disabled',
-                callDisabledByAdmin: 'Call feature has been disabled by admin',
-                privateChatWith: 'Private Chat with'
+                callTimedOut: 'Call timed out'
 
             },
             ta: {
@@ -3611,17 +3465,9 @@
                 connectionFailed: 'இணைப்பு தோல்வியடைந்தது',
                 chunks: 'துண்டுகள்',
                 callTimedOut: 'அழைப்பு நேரம் முடிந்தது',
-                callsDisabled: 'அழைப்புகள் தற்போது முடக்கப்பட்டுள்ளன',
-                callDisabledByAdmin: 'நிர்வாகி அழைப்பு அம்சத்தை முடக்கியுள்ளார்',
-                privateChatWith: 'தனிப்பட்ட உரையாடல்'
             }
 
         };
-
-        const textarea = document.getElementById('messageInput');
-        const remoteVideo = document.getElementById('remoteVideo');
-        const localVideo = document.getElementById('localVideo');
-        const remoteAudio = document.getElementById('remoteAudio');
 
         const configuration = {
             iceServers: [
@@ -3728,7 +3574,6 @@
                         return;
                     }
                     myCountryCode = data.country || null;
-                    callDisabledForMe = data.callDisabled || false;
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('chatScreen').style.display = 'flex';
                     document.getElementById('statusText').textContent = fullName + ' (' + username + ')' + ' • ' + t.groupChat;
@@ -3741,17 +3586,10 @@
                     ws.close();
                     break;
                 case 'message':
-                    addMessage(data.sender, data.content, 'received', 'group');
+                    addMessage(data.sender, data.content, 'received');
                     break;
                 case 'private_message':
-                    const senderMatch = data.sender.match(/\(([^)]+)\)/);
-                    const senderUsername = senderMatch ? senderMatch[1] : data.sender;
-
-                    if (!privateChatWindows[senderUsername]) {
-                        createPrivateChatWindow(senderUsername);
-                    }
-
-                    addMessage(data.sender, data.content, 'private', senderUsername);
+                    addMessage(data.sender, data.content, 'private');
                     break;
                 case 'user_joined':
                     addMessage('System', `${data.username} ${t.userJoined}`, 'system');
@@ -3785,10 +3623,7 @@
                     const receiverNameOnly = receiverUser && receiverUser.fullName
                         ? receiverUser.fullName
                         : data.receiver;
-
-                    if (privateChatWindows[data.receiver]) {
-                        addMessage('System', `${receiverNameOnly} ${t.privateChat}`, 'system', data.receiver);
-                    }
+                    addMessage('System', `${receiverNameOnly} ${t.privateChat}`, 'system');
                     break;
                 case 'group_enabled':
                     currentMode = 'group';
@@ -3913,20 +3748,6 @@
                     renderAdminTable(allAdminUsers);
                     break;
 
-                case 'call_disabled':
-                    addMessage('System', translations[currentLanguage].callsDisabled, 'system');
-                    break;
-
-                case 'call_permission_changed':
-                    callDisabledForMe = data.callDisabled;
-                    if (data.callDisabled) {
-                        addMessage('System', translations[currentLanguage].callDisabledByAdmin, 'system');
-                    }
-                    if (document.getElementById('userModal').style.display === 'flex') {
-                        ws.send(JSON.stringify({ type: 'list_users' }));
-                    }
-                    break;
-
 
             }
         }
@@ -4037,14 +3858,7 @@
 
 
         function addMessage(sender, content, type = 'received') {
-            let container;
-            if (targetWindow && privateChatWindows[targetWindow]) {
-                container = privateChatWindows[targetWindow];
-            } else if (activeChatWindow !== 'group' && privateChatWindows[activeChatWindow]) {
-                container = privateChatWindows[activeChatWindow];
-            } else {
-                container = document.getElementById('groupChatWindow');
-            }
+            const container = document.getElementById('messagesContainer');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type}`;
 
@@ -4089,11 +3903,7 @@
                     receiver: privateReceiver
                 }));
 
-                if (currentMode === 'private') {
-                    addMessage(translations[currentLanguage].you, message, 'sent', privateReceiver);
-                } else {
-                    addMessage(translations[currentLanguage].you, message, 'sent', 'group');
-                }
+                addMessage(translations[currentLanguage].you, message, 'sent');
             }
 
             input.value = '';
@@ -4201,18 +4011,11 @@
                     const callBtn = document.createElement('button');
                     callBtn.className = 'btn-call';
 
-                    if (callDisabledForMe || user.callDisabled || user.callState !== 'idle') {
-                        if (user.callState !== 'idle') {
-                            callBtn.textContent = t.inCall;
-                        } else {
-                            callBtn.innerHTML = '📞 ' + (t.callBtn || 'Call');
-                        }
+                    if (user.callState !== 'idle') {
+                        callBtn.textContent = t.inCall
                         callBtn.disabled = true;
-                        callBtn.style.opacity = '0.5';
+                        callBtn.style.opacity = '0.6';
                         callBtn.style.cursor = 'not-allowed';
-                        if (callDisabledForMe || user.callDisabled) {
-                            callBtn.title = t.callsDisabled || 'Calls disabled';
-                        }
                     } else {
                         callBtn.innerHTML = '📞 ' + (t.callBtn || 'Call');
                         callBtn.onclick = () => {
@@ -4225,14 +4028,11 @@
                     const videoCallBtn = document.createElement('button');
                     videoCallBtn.className = 'btn-call btn-video-call';
 
-                    if (callDisabledForMe || user.callDisabled || user.callState !== 'idle') {
+                    if (user.callState !== 'idle') {
                         videoCallBtn.textContent = '📹';
                         videoCallBtn.disabled = true;
-                        videoCallBtn.style.opacity = '0.5';
+                        videoCallBtn.style.opacity = '0.6';
                         videoCallBtn.style.cursor = 'not-allowed';
-                        if (callDisabledForMe || user.callDisabled) {
-                            videoCallBtn.title = t.callsDisabled || 'Calls disabled';
-                        }
                     } else {
                         videoCallBtn.innerHTML = '📹';
                         videoCallBtn.onclick = () => {
@@ -4240,6 +4040,7 @@
                             closeUserModal();
                         };
                     }
+
                     const chatBtn = document.createElement('button');
                     chatBtn.className = 'btn-chat';
                     chatBtn.textContent = t.chatBtn;
@@ -4256,22 +4057,15 @@
         }
 
         function startPrivateChat(user) {
-            if (!privateChatWindows[user]) {
-                createPrivateChatWindow(user);
-            }
-
             ws.send(JSON.stringify({
                 type: 'enable_private',
                 receiver: user
             }));
-
-            switchToChatWindow(user);
             closeUserModal();
         }
 
         function enableGroupChat() {
             ws.send(JSON.stringify({ type: 'enable_group' }));
-            switchToChatWindow('group');
         }
 
         async function handleFileSelect(event) {
@@ -4475,54 +4269,9 @@
             transferCancelled = true;
         }
 
-        function createPrivateChatWindow(username) {
-            const container = document.getElementById('messagesContainer');
-
-            const chatWindow = document.createElement('div');
-            chatWindow.className = 'chat-window';
-            chatWindow.id = `chat-${username}`;
-
-            const indicator = document.createElement('div');
-            indicator.className = 'private-chat-indicator';
-            const t = translations[currentLanguage];
-            const userObj = onlineUsers.find(u => u.name === username);
-            const displayName = userObj?.fullName || username;
-            indicator.textContent = `${t.privateChatWith || 'Private Chat with'} ${displayName}`;
-
-            chatWindow.appendChild(indicator);
-            container.appendChild(chatWindow);
-
-            privateChatWindows[username] = chatWindow;
-        }
-
-        function switchToChatWindow(windowName) {
-            activeChatWindow = windowName;
-
-            document.getElementById('groupChatWindow').classList.remove('active');
-            Object.values(privateChatWindows).forEach(win => {
-                win.classList.remove('active');
-            });
-
-            if (windowName === 'group') {
-                document.getElementById('groupChatWindow').classList.add('active');
-            } else if (privateChatWindows[windowName]) {
-                privateChatWindows[windowName].classList.add('active');
-            }
-
-            setTimeout(() => {
-                const container = document.getElementById('messagesContainer');
-                container.scrollTop = container.scrollHeight;
-            }, 50);
-        }
-
 
         // WebRTC Functions
         async function initiateCall(targetUser, videoEnabled = false) {
-
-            if (callDisabledForMe) {
-                alert(translations[currentLanguage].callsDisabled || 'Calls are currently disabled');
-                return;
-            }
 
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({
@@ -5245,7 +4994,7 @@
 
 
             if (!users.length) {
-                tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No users found</td></tr>';
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No users found</td></tr>';
                 return;
             }
 
@@ -5270,34 +5019,29 @@
                     : '—';
 
                 tr.innerHTML = `
-    <td data-label="#">${i + 1}</td>
-    <td data-label="User">
-        <div class="user-badge">
-            <div class="avatar-sm">${(u.fullName || u.userName || '?')[0].toUpperCase()}</div>
-            <div class="user-name-cell">
-                <strong>${escapeHtml(u.fullName || '—')}</strong>
-                <span>${escapeHtml(u.userName || '—')}</span>
-            </div>
-        </div>
-    </td>
-    <td data-label="Username" style="font-weight:600;color:#ccc;">@${escapeHtml(u.userName || '—')}</td>
-    <td data-label="Status">
-        <span class="status-badge ${u.status === 'active' ? 'active' : 'inactive'}">
-            ${u.status === 'active' ? 'Active' : 'Inactive'}
-        </span>
-    </td>
-    <td data-label="IP" class="ip-cell">${escapeHtml(u.ipAddress || '—')}</td>
-    <td data-label="Location" class="loc-cell">${escapeHtml(loc || '—')}</td>
-    <td data-label="Last Seen" style="font-size:11px;color:#888;">${escapeHtml(lastSeen)}</td>
-    <td data-label="Call Access">
-        <button class="btn-toggle-call ${u.callDisabled ? 'disabled' : ''}" onclick="adminToggleUserCall('${escapeHtml(u.userName)}', ${!u.callDisabled})">
-            ${u.callDisabled ? '🔊 Enable' : '🔇 Disable'}
-        </button>
-    </td>
-    <td data-label="Action">
-        <button class="btn-del" onclick="adminDeleteUser('${escapeHtml(u.userName)}')">🗑️ Delete</button>
-    </td>
-`;
+            <td data-label="#">${i + 1}</td>
+            <td data-label="User">
+                <div class="user-badge">
+                    <div class="avatar-sm">${(u.fullName || u.userName || '?')[0].toUpperCase()}</div>
+                    <div class="user-name-cell">
+                        <strong>${escapeHtml(u.fullName || '—')}</strong>
+                        <span>${escapeHtml(u.userName || '—')}</span>
+                    </div>
+                </div>
+            </td>
+            <td data-label="Username" style="font-weight:600;color:#ccc;">@${escapeHtml(u.userName || '—')}</td>
+            <td data-label="Status">
+                <span class="status-badge ${u.status === 'active' ? 'active' : 'inactive'}">
+                    ${u.status === 'active' ? 'Active' : 'Inactive'}
+                </span>
+            </td>
+            <td data-label="IP" class="ip-cell">${escapeHtml(u.ipAddress || '—')}</td>
+            <td data-label="Location" class="loc-cell">${escapeHtml(loc || '—')}</td>
+            <td data-label="Last Seen" style="font-size:11px;color:#888;">${escapeHtml(lastSeen)}</td>
+            <td data-label="Action">
+                <button class="btn-del" onclick="adminDeleteUser('${escapeHtml(u.userName)}')">🗑️ Delete</button>
+            </td>
+        `;
                 tbody.appendChild(tr);
             });
         }
@@ -5333,30 +5077,6 @@
             if (!confirm('Delete ALL inactive users? This cannot be undone.')) return;
             if (ws?.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: 'admin_delete_inactive' }));
-            }
-        }
-
-        function adminToggleUserCall(targetUser, enable) {
-            if (!confirm(`${enable ? 'Enable' : 'Disable'} calls for "${targetUser}"?`)) return;
-            if (ws?.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
-                    type: enable ? 'admin_enable_call_user' : 'admin_disable_call_user',
-                    target: targetUser
-                }));
-            }
-        }
-
-        function adminDisableCallGlobal() {
-            if (!confirm('Disable calls for ALL users? This will affect everyone.')) return;
-            if (ws?.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'admin_disable_call_global' }));
-            }
-        }
-
-        function adminEnableCallGlobal() {
-            if (!confirm('Enable calls for all users?')) return;
-            if (ws?.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'admin_enable_call_global' }));
             }
         }
     </script>
