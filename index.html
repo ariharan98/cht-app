@@ -1357,8 +1357,6 @@
             scrollbar-color: rgba(102, 126, 234, 0.45) transparent;
         }
 
-        /* Add these inside body.light-theme { } section */
-
         body.light-theme .btn-call {
             background: rgba(34, 197, 94, 0.1);
             border-color: #22c55e;
@@ -1738,7 +1736,183 @@
         }
 
 
+        .private-chat-window {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            background: #0a0a0a;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+        }
 
+        .private-chat-window.active {
+            display: flex;
+        }
+
+        .private-chat-header {
+            padding: 20px 30px;
+            background: rgba(20, 20, 20, 0.95);
+            border-bottom: 2px solid rgba(224, 0, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .private-chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-back {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(224, 0, 0, 0.2);
+            border: 2px solid rgba(224, 0, 0, 0.3);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-back:hover {
+            background: rgba(224, 0, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        .private-chat-info h2 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #e00000, #ff6347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .private-chat-status {
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        body.light-theme .private-chat-window {
+            background: #f5f7fa;
+        }
+
+        body.light-theme .private-chat-header {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 2px solid rgba(100, 116, 139, 0.2);
+        }
+
+        body.light-theme .private-chat-info h2 {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.light-theme .private-chat-status {
+            color: #64748b;
+        }
+
+        body.light-theme .btn-back {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            color: #667eea;
+        }
+
+        body.light-theme .btn-back:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .private-message-input {
+            flex: 1;
+            width: 100%;
+            min-height: 44px;
+            max-height: 140px;
+            padding: 12px 16px;
+            font-size: 15px;
+            line-height: 1.4;
+            resize: none;
+            overflow-y: hidden;
+            overflow-x: hidden;
+            border-radius: 20px;
+            border: 2px solid rgba(224, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            transition: border-color 0.25s ease, background 0.25s ease;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(224, 0, 0, 0.45) transparent;
+            font-family: inherit;
+        }
+
+        .private-message-input::placeholder {
+            color: #666;
+        }
+
+        .private-message-input:focus {
+            outline: none;
+            border-color: #e00000;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .private-message-input::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .private-message-input::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .private-message-input::-webkit-scrollbar-thumb {
+            background: rgba(224, 0, 0, 0.35);
+            border-radius: 10px;
+        }
+
+        .private-message-input::-webkit-scrollbar-thumb:hover {
+            background: rgba(224, 0, 0, 0.6);
+        }
+
+        body.light-theme .private-message-input {
+            background: rgba(100, 116, 139, 0.05);
+            border: 2px solid rgba(100, 116, 139, 0.2);
+            color: #1a1a1a;
+        }
+
+        body.light-theme .private-message-input::placeholder {
+            color: #94a3b8;
+        }
+
+        body.light-theme .private-message-input:focus {
+            border-color: #667eea;
+            background: rgba(100, 116, 139, 0.08);
+        }
+
+        body.light-theme .private-message-input::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.35);
+        }
+
+        body.light-theme .private-message-input::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.6);
+        }
+
+        body.light-theme .private-message-input {
+            scrollbar-color: rgba(102, 126, 234, 0.45) transparent;
+        }
 
         @media (max-width: 768px) {
 
@@ -2143,6 +2317,64 @@
 
             body.light-theme td::before {
                 color: #94a3b8;
+            }
+
+            .private-chat-header {
+                padding: 8px 14px;
+                gap: 10px;
+            }
+
+            .private-chat-info h2 {
+                font-size: 16px;
+                line-height: 1.2;
+                margin-bottom: 2px;
+            }
+
+            .private-chat-status {
+                font-size: 11px;
+            }
+
+            .btn-back {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+
+            .private-chat-header {
+                padding: 8px 14px;
+                gap: 10px;
+            }
+
+            .private-chat-info h2 {
+                font-size: 16px;
+                line-height: 1.2;
+                margin-bottom: 2px;
+            }
+
+            .private-chat-status {
+                font-size: 11px;
+            }
+
+            .btn-back {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+
+            .private-chat-header .icon-btn {
+                padding: 6px;
+                min-width: 38px;
+                min-height: 38px;
+                border-radius: 10px;
+            }
+
+            .private-chat-header .icon-btn .label {
+                font-size: 8px;
+                font-weight: 400;
+            }
+
+            .private-chat-header .icon-btn .icon {
+                font-size: 16px;
             }
         }
 
@@ -2573,6 +2805,79 @@
             .empty-row td {
                 padding: 24px;
                 font-size: 12px;
+            }
+
+            .private-chat-header {
+                padding: 6px 10px;
+            }
+
+            .private-chat-info h2 {
+                font-size: 15px;
+                font-weight: 600;
+            }
+
+            .private-chat-status {
+                font-size: 10px;
+                opacity: 0.75;
+            }
+
+            .btn-back {
+                width: 34px;
+                height: 34px;
+                font-size: 16px;
+            }
+
+            .private-chat-header {
+                padding: 6px 10px;
+                gap: 6px;
+            }
+
+            .private-chat-header-left {
+                gap: 8px;
+            }
+
+            .private-chat-info h2 {
+                font-size: 15px;
+                font-weight: 600;
+                line-height: 1.2;
+                margin-bottom: 2px;
+            }
+
+            .private-chat-status {
+                font-size: 10px;
+                opacity: 0.75;
+            }
+
+            .btn-back {
+                width: 34px;
+                height: 34px;
+                font-size: 16px;
+            }
+
+            .private-chat-header .chat-header-right {
+                gap: 8px;
+            }
+
+            .private-chat-header .icon-btn {
+                padding: 6px;
+                min-width: 38px;
+                min-height: 38px;
+                border-radius: 10px;
+            }
+
+            .private-chat-header .icon-btn .label {
+                font-size: 8px;
+                font-weight: 400;
+            }
+
+            .private-chat-header .icon-btn .icon {
+                font-size: 16px;
+            }
+
+            .private-message-input {
+                font-size: 13px;
+                line-height: 1.4;
+                max-height: 110px;
             }
         }
 
@@ -3177,6 +3482,7 @@
             </button>
         </div>
     </div>
+    <div id="privateChatWindows"></div>
 
     <div id="userModal" class="modal">
         <div class="modal-content">
@@ -3588,6 +3894,251 @@
             ]
         };
 
+        function showPrivateChatWindow(username) {
+            activeChatWindow = username;
+
+            document.getElementById('chatScreen').style.display = 'none';
+
+            const safeId = btoa(username).replace(/[^a-zA-Z0-9]/g, '');
+            let windowId = `private-chat-${safeId}`;
+            let chatWindow = document.getElementById(windowId);
+
+            if (!chatWindow) {
+                chatWindow = createPrivateChatWindow(username);
+                document.getElementById('privateChatWindows').appendChild(chatWindow);
+                privateChatWindows[username] = {
+                    element: chatWindow,
+                    messages: []
+                };
+            }
+
+            chatWindow.classList.add('active');
+
+            const messagesContainer = chatWindow.querySelector('.messages-container[data-username="' + username + '"]');
+            if (messagesContainer) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        function createPrivateChatWindow(username) {
+            const t = translations[currentLanguage];
+            const receiverUser = onlineUsers.find(u => u.name === username);
+            const displayLabel = receiverUser?.displayName
+                ? receiverUser.displayName
+                : receiverUser?.fullName && receiverUser.fullName !== username
+                    ? `${receiverUser.fullName} (${username})`
+                    : username;
+
+            const callsDisabled = callDisabledForMe || receiverUser?.callDisabled || receiverUser?.callState !== 'idle';
+
+            const safeId = btoa(username).replace(/[^a-zA-Z0-9]/g, '');
+
+            const windowDiv = document.createElement('div');
+            windowDiv.className = 'private-chat-window';
+            windowDiv.id = `private-chat-${safeId}`;
+            windowDiv.setAttribute('data-username', username);
+
+            windowDiv.innerHTML = `
+        <div class="private-chat-header">
+            <div class="private-chat-header-left">
+                <button class="btn-back" onclick="closePrivateChatWindow('${username.replace(/'/g, "\\'")}')">
+                    ←
+                </button>
+                <div class="private-chat-info">
+                    <h2>${displayLabel}</h2>
+                    <div class="private-chat-status">
+                        <div class="status-dot"></div>
+                        <span>${t.privateChat}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-header-right" lang="ta">
+                <button class="btn-secondary icon-btn private-call-btn" data-username="${username}" ${callsDisabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+                    <span class="icon">📞</span>
+                    <span class="label">${t.callBtn || 'Call'}</span>
+                </button>
+                <button class="btn-secondary icon-btn private-video-btn" data-username="${username}" ${callsDisabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+                    <span class="icon">📹</span>
+                    <span class="label">Video</span>
+                </button>
+                <button class="btn-secondary icon-btn" onclick="toggleTheme()">
+                    <span class="icon">🎨</span>
+                    <span class="label">${t.themeBtn}</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="messages-container" data-username="${username}"></div>
+        
+        <div class="input-container">
+            <input type="file" class="private-file-input" multiple style="display: none;" data-username="${username}">
+            <button class="btn-icon private-file-btn" data-username="${username}">
+                📎
+            </button>
+            <textarea class="private-message-input" placeholder="${t.typeMessage}" rows="1" data-username="${username}"></textarea>
+            <button class="btn-send private-send-btn" data-username="${username}">
+                ➤
+            </button>
+        </div>
+    `;
+
+            const fileInput = windowDiv.querySelector('.private-file-input');
+            const fileBtn = windowDiv.querySelector('.private-file-btn');
+            const textarea = windowDiv.querySelector('.private-message-input');
+            const sendBtn = windowDiv.querySelector('.private-send-btn');
+            const callBtn = windowDiv.querySelector('.private-call-btn');
+            const videoBtn = windowDiv.querySelector('.private-video-btn');
+
+            fileBtn.onclick = () => fileInput.click();
+            fileInput.onchange = (e) => handlePrivateFileSelect(e, username);
+            sendBtn.onclick = () => sendPrivateMessage(username);
+
+            if (!callsDisabled) {
+                callBtn.onclick = () => {
+                    initiateCall(username);
+                    closeUserModal();
+                };
+                videoBtn.onclick = () => {
+                    initiateCall(username, true);
+                    closeUserModal();
+                };
+            }
+
+            setupTextareaAutoResize(textarea, username);
+
+            return windowDiv;
+        }
+
+        function setupTextareaAutoResize(textarea, username) {
+            textarea.addEventListener('input', function () {
+                textarea.style.height = 'auto';
+                const maxHeight = window.innerWidth <= 480 ? 80 : 100;
+
+                if (textarea.scrollHeight > maxHeight) {
+                    textarea.style.height = maxHeight + 'px';
+                    textarea.style.overflowY = 'auto';
+                } else {
+                    textarea.style.height = textarea.scrollHeight + 'px';
+                    textarea.style.overflowY = 'hidden';
+                }
+            });
+
+            textarea.addEventListener('keydown', function (e) {
+                if (!isMobile() && e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendPrivateMessage(username);
+                }
+            });
+        }
+
+        function closePrivateChatWindow(username) {
+            const safeId = btoa(username).replace(/[^a-zA-Z0-9]/g, '');
+            const windowId = `private-chat-${safeId}`;
+            const chatWindow = document.getElementById(windowId);
+
+            if (chatWindow) {
+                chatWindow.classList.remove('active');
+            }
+
+            activeChatWindow = 'group';
+            document.getElementById('chatScreen').style.display = 'flex';
+
+            ws.send(JSON.stringify({ type: 'enable_group' }));
+        }
+
+        function sendPrivateMessage(username) {
+            const safeId = btoa(username).replace(/[^a-zA-Z0-9]/g, '');
+            const chatWindow = document.getElementById(`private-chat-${safeId}`);
+            if (!chatWindow) return;
+
+            const input = chatWindow.querySelector('.private-message-input[data-username="' + username + '"]');
+            const message = input.value.trim();
+
+            if (!message || !ws) return;
+
+            ws.send(JSON.stringify({
+                type: 'private_message',
+                content: message,
+                receiver: username
+            }));
+
+            addPrivateMessage(username, translations[currentLanguage].you, message, 'sent');
+
+            input.value = '';
+            input.style.height = 'auto';
+            input.style.height = '44px';
+            input.style.overflowY = 'hidden';
+        }
+
+        function addPrivateMessage(username, sender, content, type = 'received') {
+            const safeId = btoa(username).replace(/[^a-zA-Z0-9]/g, '');
+            const chatWindow = document.getElementById(`private-chat-${safeId}`);
+            if (!chatWindow) return;
+
+            const container = chatWindow.querySelector('.messages-container[data-username="' + username + '"]');
+            if (!container) return;
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            if (type !== 'system' && type !== 'sent') {
+                const senderDiv = document.createElement('div');
+                senderDiv.className = 'message-sender';
+                senderDiv.textContent = sender;
+                bubble.appendChild(senderDiv);
+            }
+
+            const contentDiv = document.createElement('div');
+            contentDiv.textContent = content;
+            bubble.appendChild(contentDiv);
+
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = time;
+            bubble.appendChild(timeDiv);
+
+            messageDiv.appendChild(bubble);
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handlePrivateFileSelect(event, username) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert(translations[currentLanguage].notConnected);
+                return;
+            }
+
+            const fileArray = Array.from(files);
+
+            fileArray.forEach(async (file, i) => {
+                addPrivateMessage(
+                    username,
+                    'System',
+                    `${translations[currentLanguage].sendingFile} ${file.name} (${formatFileSize(file.size)}) [${i + 1}/${fileArray.length}]`,
+                    'system'
+                );
+
+                try {
+                    await sendFileInChunks(file, username);
+                    if (i < fileArray.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    }
+                } catch (error) {
+                    console.error(`Failed to send ${file.name}:`, error);
+                }
+            });
+
+            event.target.value = '';
+        }
+
 
         function connect() {
             fullName = document.getElementById('fullNameInput').value.trim();
@@ -3702,7 +4253,13 @@
                     addMessage(data.sender, data.content, 'received');
                     break;
                 case 'private_message':
-                    addMessage(data.sender, data.content, 'private');
+                    const senderUsername = data.senderUsername || extractUsername(data.sender);
+
+                    if (activeChatWindow === senderUsername) {
+                        addPrivateMessage(senderUsername, data.sender, data.content, 'received');
+                    } else {
+                        addMessage(data.sender, data.content, 'private');
+                    }
                     break;
                 case 'user_joined':
                     addMessage('System', `${data.username} ${t.userJoined}`, 'system');
@@ -3721,22 +4278,7 @@
                     currentMode = 'private';
                     privateReceiver = data.receiver;
 
-                    const myFullDisplay = fullName + ' (' + username + ')';
-                    const receiverUser = onlineUsers.find(u => u.name === data.receiver);
-                    const receiverFullDisplay = receiverUser && receiverUser.fullName
-                        ? receiverUser.fullName + ' (' + data.receiver + ')'
-                        : data.receiver;
-
-                    if (currentLanguage === 'ta') {
-                        document.getElementById('statusText').textContent = myFullDisplay + ' • ' + receiverFullDisplay + ' ' + t.privateChat;
-                    } else {
-                        document.getElementById('statusText').textContent = myFullDisplay + ' • ' + t.privateChat + ' ' + receiverFullDisplay;
-                    }
-
-                    const receiverNameOnly = receiverUser && receiverUser.fullName
-                        ? receiverUser.fullName
-                        : data.receiver;
-                    addMessage('System', `${receiverNameOnly} ${t.privateChat}`, 'system');
+                    showPrivateChatWindow(data.receiver);
                     break;
                 case 'group_enabled':
                     currentMode = 'group';
@@ -4196,6 +4738,7 @@
                 type: 'enable_private',
                 receiver: user
             }));
+            showPrivateChatWindow(user);
             closeUserModal();
         }
 
@@ -5249,6 +5792,11 @@
             if (ws?.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: 'admin_enable_call_global' }));
             }
+        }
+
+        function extractUsername(displayNameStr) {
+            const match = displayNameStr.match(/\(([^)]+)\)$/);
+            return match ? match[1] : displayNameStr;
         }
     </script>
 
