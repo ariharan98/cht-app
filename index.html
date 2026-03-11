@@ -1760,7 +1760,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
+            flex-wrap: flex-start;
             gap: 15px;
             backdrop-filter: blur(10px);
         }
@@ -1912,6 +1912,38 @@
 
         body.light-theme .private-message-input {
             scrollbar-color: rgba(102, 126, 234, 0.45) transparent;
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid rgba(224, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 12px 24px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        body.light-theme .toast-notification {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(102, 126, 234, 0.5);
+            color: #1a1a1a;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         }
 
         @media (max-width: 768px) {
@@ -2834,6 +2866,7 @@
 
             .private-chat-header-left {
                 gap: 8px;
+                align-items: center;
             }
 
             .private-chat-info h2 {
@@ -2855,7 +2888,9 @@
             }
 
             .private-chat-header .chat-header-right {
-                gap: 8px;
+                gap: 6px;
+                align-items: center;
+                flex-wrap: nowrap;
             }
 
             .private-chat-header .icon-btn {
@@ -2878,6 +2913,12 @@
                 font-size: 13px;
                 line-height: 1.4;
                 max-height: 110px;
+            }
+
+            .toast-notification {
+                bottom: 80px;
+                font-size: 13px;
+                padding: 10px 20px;
             }
         }
 
@@ -3450,9 +3491,9 @@
                     <span class="label" id="usersBtnText">உறுப்பினர்கள்</span>
                 </button>
 
-                <button class="btn-secondary icon-btn" onclick="enableGroupChat()">
-                    <span class="icon">🌍</span>
-                    <span class="label" id="groupBtnText">குழுமம்</span>
+                <button class="btn-secondary icon-btn" onclick="clearGroupChat()">
+                    <span class="icon">🗑️</span>
+                    <span class="label" id="clearBtnText">அழி</span>
                 </button>
 
                 <button class="btn-secondary icon-btn" onclick="toggleTheme()">
@@ -3586,6 +3627,8 @@
         </div>
         <div class="progress-info" id="progressInfo">0 / 0 chunks</div>
     </div>
+
+    <div id="toastNotification" class="toast-notification"></div>
 
 
 
@@ -3788,7 +3831,8 @@
                 callTimedOut: 'Call timed out',
                 callsDisabled: 'Calls are currently disabled',
                 callDisabledByAdmin: 'Call feature has been disabled by admin',
-                callEnabledByAdmin: 'Call feature has been enabled by admin'
+                callEnabledByAdmin: 'Call feature has been enabled by admin',
+                clearBtn: 'Clear'
 
             },
             ta: {
@@ -3877,7 +3921,8 @@
                 callTimedOut: 'அழைப்பு நேரம் முடிந்தது',
                 callsDisabled: 'அழைப்புகள் தற்போது முடக்கப்பட்டுள்ளன',
                 callDisabledByAdmin: 'நிர்வாகி அழைப்பு அம்சத்தை முடக்கியுள்ளார்',
-                callEnabledByAdmin: 'நிர்வாகி அழைப்பு அம்சத்தை இயக்கியுள்ளார்'
+                callEnabledByAdmin: 'நிர்வாகி அழைப்பு அம்சத்தை இயக்கியுள்ளார்',
+                clearBtn: 'அழி'
             }
 
         };
@@ -3952,7 +3997,7 @@
                     </div>
                 </div>
             </div>
-            <div class="chat-header-right" lang="ta">
+            <div class="chat-header-right" lang="ta" style="align-items:center;">
                 <button class="btn-secondary icon-btn private-call-btn" data-username="${username}" ${callsDisabled ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
                     <span class="icon">📞</span>
                     <span class="label">${t.callBtn || 'Call'}</span>
@@ -3964,6 +4009,10 @@
                 <button class="btn-secondary icon-btn" onclick="toggleTheme()">
                     <span class="icon">🎨</span>
                     <span class="label">${t.themeBtn}</span>
+                </button>
+                <button class="btn-secondary icon-btn" onclick="clearPrivateChat('${username.replace(/'/g, "\\'")}')">
+                    <span class="icon">🗑️</span>
+                    <span class="label">${t.clearBtn || 'Clear'}</span>
                 </button>
             </div>
         </div>
@@ -4269,6 +4318,19 @@
                     if (data.username === currentCallUser) {
                         endCall();
                     }
+
+                    let userName = extractUsername(data.username);
+
+                    if (activeChatWindow === userName) {
+                        closePrivateChatWindow(userName);
+                    }
+
+                    const safeId = btoa(userName).replace(/[^a-zA-Z0-9]/g, '');
+                    const leftUserWindow = document.getElementById(`private-chat-${safeId}`);
+                    if (leftUserWindow) {
+                        leftUserWindow.remove();
+                        delete privateChatWindows[userName];
+                    }
                     break;
                 case 'user_list':
                     onlineUsers = data.users;
@@ -4336,16 +4398,19 @@
 
                     showProgress(data.fileName, 'receive');
 
-                    if (currentLanguage === 'ta') {
-                        addMessage('System',
-                            `${data.sender} அவர்களிடமிருந்து ${data.fileName} ${t.receiving} (${formatFileSize(data.fileSize)})...`,
-                            'system'
-                        );
+                    const sUser = extractUsername(data.sender);
+
+                    const isPrivateFile = activeChatWindow === sUser ||
+                        (currentMode === 'private' && privateReceiver === sUser);
+
+                    const fileReceiveMessage = currentLanguage === 'ta'
+                        ? `${data.sender} அவர்களிடமிருந்து ${data.fileName} ${t.receiving} (${formatFileSize(data.fileSize)})...`
+                        : `${t.receivingFileFrom} ${data.fileName} ${t.from} ${data.sender} (${formatFileSize(data.fileSize)})...`;
+
+                    if (isPrivateFile) {
+                        addPrivateMessage(sUser, 'System', fileReceiveMessage, 'system');
                     } else {
-                        addMessage('System',
-                            `${t.receivingFileFrom} ${data.fileName} ${t.from} ${data.sender} (${formatFileSize(data.fileSize)})...`,
-                            'system'
-                        );
+                        addMessage('System', fileReceiveMessage, 'system');
                     }
                     break;
 
@@ -4389,14 +4454,24 @@
                 case 'file_transfer_cancel':
                     transferCancelled = true;
                     receivingFile = false;
+
+                    const cancelSenderUsername = extractUsername(currentFileSender);
+                    const isPrivateCancel = activeChatWindow === cancelSenderUsername;
+
                     receivedChunks = [];
                     totalChunksExpected = 0;
                     currentFileName = '';
                     currentFileSender = '';
                     currentFileSize = 0;
 
+
                     hideProgress();
-                    addMessage('System', translations[currentLanguage].fileTransferCancelledBySender, 'system');
+                    if (isPrivateCancel) {
+                        addPrivateMessage(cancelSenderUsername, 'System',
+                            translations[currentLanguage].fileTransferCancelledBySender, 'system');
+                    } else {
+                        addMessage('System', translations[currentLanguage].fileTransferCancelledBySender, 'system');
+                    }
                     break;
                 case 'call_disabled':
                     addMessage('System', translations[currentLanguage].callsDisabled, 'system');
@@ -4476,11 +4551,18 @@
                 URL.revokeObjectURL(fileData);
             }
 
-            addMessage(
-                sender,
-                `${translations[currentLanguage].file} : ${fileName} ${translations[currentLanguage].fileSaved}`,
-                'received'
-            );
+            const senderUsername = extractUsername(sender);
+            const isPrivate = activeChatWindow === senderUsername;
+
+            if (isPrivate) {
+                addPrivateMessage(senderUsername, sender,
+                    `${translations[currentLanguage].file} : ${fileName} ${translations[currentLanguage].fileSaved}`,
+                    'received');
+            } else {
+                addMessage(sender,
+                    `${translations[currentLanguage].file} : ${fileName} ${translations[currentLanguage].fileSaved}`,
+                    'received');
+            }
 
             closeFileDialog(true, sender, fileName);
         }
@@ -4491,7 +4573,18 @@
             modal.style.display = 'none';
 
             if (!saved) {
-                addMessage(sender, `${translations[currentLanguage].file} : ${fileName} ${translations[currentLanguage].fileNotSaved}`, 'received');
+                const senderUsername = extractUsername(sender);
+                const isPrivate = activeChatWindow === senderUsername;
+
+                if (isPrivate) {
+                    addPrivateMessage(senderUsername, sender,
+                        `${translations[currentLanguage].file} : ${fileName} ${translations[currentLanguage].fileNotSaved}`,
+                        'received');
+                } else {
+                    addMessage(sender,
+                        `${translations[currentLanguage].file} : ${fileName} ${translations[currentLanguage].fileNotSaved}`,
+                        'received');
+                }
             }
 
             isShowingFileDialog = false;
@@ -4835,10 +4928,13 @@
                 fileName: file.name
             }));
 
-            addMessage(translations[currentLanguage].you,
-                `${translations[currentLanguage].fileSent}: ${file.name} (${formatFileSize(file.size)})`,
-                'sent'
-            );
+            const sentMessage = `${translations[currentLanguage].fileSent}: ${file.name} (${formatFileSize(file.size)})`;
+
+            if (receiver !== 'GROUP') {
+                addPrivateMessage(receiver, translations[currentLanguage].you, sentMessage, 'sent');
+            } else {
+                addMessage(translations[currentLanguage].you, sentMessage, 'sent');
+            }
             return false;
         }
 
@@ -5404,7 +5500,8 @@
 
             document.getElementById('chatTitle').textContent = t.chatTitle;
             document.getElementById('usersBtnText').textContent = t.usersBtn;
-            document.getElementById('groupBtnText').textContent = t.groupBtn;
+            // document.getElementById('groupBtnText').textContent = t.groupBtn;
+            document.getElementById('clearBtnText').textContent = t.clearBtn;
             document.getElementById('themeBtnText').textContent = t.themeBtn;
             document.getElementById('langToggleChatText').textContent = t.langToggle;
             document.getElementById('modalTitle').textContent = t.modalTitle;
@@ -5431,6 +5528,21 @@
                     document.getElementById('statusText').textContent = fullName + ' (' + username + ')' + ' • ' + t.privateChat + ' ' + privateReceiver;
                 }
             }
+
+            document.querySelectorAll('.private-chat-window').forEach(win => {
+                const uname = win.getAttribute('data-username');
+                const callLabel = win.querySelector('.private-call-btn .label');
+                const themeLabel = win.querySelector('.icon-btn:nth-child(3) .label');
+                const clearLabel = win.querySelector('.icon-btn:nth-child(4) .label');
+                const input = win.querySelector('.private-message-input');
+                const statusSpan = win.querySelector('.private-chat-status span');
+
+                if (callLabel) callLabel.textContent = t.callBtn || 'Call';
+                if (themeLabel) themeLabel.textContent = t.themeBtn;
+                if (clearLabel) clearLabel.textContent = t.clearBtn || 'Clear';
+                if (input) input.placeholder = t.typeMessage;
+                if (statusSpan) statusSpan.textContent = t.privateChat;
+            });
         }
 
 
@@ -5798,6 +5910,64 @@
             const match = displayNameStr.match(/\(([^)]+)\)$/);
             return match ? match[1] : displayNameStr;
         }
+
+        function showToast(message, duration = 1500) {
+            const toast = document.getElementById('toastNotification');
+            if (!toast) return;
+
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        function clearGroupChat() {
+            const t = translations[currentLanguage];
+            const confirmMessage = currentLanguage === 'ta'
+                ? 'குழு அரட்டை செய்திகளை அழிக்க வேண்டுமா?'
+                : 'Clear group chat messages?';
+
+            if (!confirm(confirmMessage)) return;
+
+            const groupContainer = document.getElementById('messagesContainer');
+            if (groupContainer) {
+                groupContainer.innerHTML = '';
+            }
+
+            const successMessage = currentLanguage === 'ta'
+                ? '✓ குழு செய்திகள் அழிக்கப்பட்டன'
+                : '✓ Group messages cleared';
+
+            showToast(successMessage);
+        }
+
+        function clearPrivateChat(username) {
+            const t = translations[currentLanguage];
+            const confirmMessage = currentLanguage === 'ta'
+                ? `${username} உடனான செய்திகளை அழிக்க வேண்டுமா?`
+                : `Clear messages with ${username}?`;
+
+            if (!confirm(confirmMessage)) return;
+
+            const safeId = btoa(username).replace(/[^a-zA-Z0-9]/g, '');
+            const chatWindow = document.getElementById(`private-chat-${safeId}`);
+
+            if (chatWindow) {
+                const container = chatWindow.querySelector('.messages-container[data-username="' + username + '"]');
+                if (container) {
+                    container.innerHTML = '';
+                }
+
+                const successMessage = currentLanguage === 'ta'
+                    ? '✓ செய்திகள் அழிக்கப்பட்டன'
+                    : '✓ Messages cleared';
+
+                showToast(successMessage);
+            }
+        }
+
     </script>
 
 </body>
