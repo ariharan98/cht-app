@@ -1740,6 +1740,7 @@
             display: none;
             flex-direction: column;
             height: 100vh;
+            height: 100dvh;
             background: #0a0a0a;
             position: fixed;
             top: 0;
@@ -1747,6 +1748,7 @@
             right: 0;
             bottom: 0;
             z-index: 100;
+            overflow: hidden;
         }
 
         .private-chat-window.active {
@@ -2913,6 +2915,15 @@
                 font-size: 13px;
                 line-height: 1.4;
                 max-height: 110px;
+            }
+
+            .private-chat-window .messages-container {
+                min-height: 0;
+            }
+
+            .private-chat-window .input-container {
+                flex-shrink: 0;
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
             }
 
             .toast-notification {
