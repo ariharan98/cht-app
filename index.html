@@ -5172,6 +5172,12 @@
                 message = translations[currentLanguage].countryBlocked;
             }
 
+            if (activeChatWindow !== 'group' && activeChatWindow === currentCallUser) {
+                addPrivateMessage(activeChatWindow, 'System', message, 'system');
+            } else {
+                addMessage('System', message, 'system');
+            }
+
             addMessage('System', message, 'system');
             closeCallModal();
             if (localStream) {
