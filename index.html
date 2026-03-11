@@ -2917,13 +2917,14 @@
                 max-height: 110px;
             }
 
-            .private-chat-window .messages-container {
+            .private-chat-window>.messages-container {
+                flex: 1;
                 min-height: 0;
+                overflow-y: auto;
             }
 
-            .private-chat-window .input-container {
+            .private-chat-window>.input-container {
                 flex-shrink: 0;
-                padding-bottom: max(10px, env(safe-area-inset-bottom));
             }
 
             .toast-notification {
